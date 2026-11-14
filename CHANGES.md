@@ -174,3 +174,8 @@ Defaults unchanged (original behaviour). Check: E11chk (`--trigger_mode hsv`, `s
 - `experiments/analyze_e11.py` (CPU): real vs simulated recall on E0's 102 incidents (v1), recovery within 10 frames
   on E0's incidents (E0 vs E11a J curves), cosine between consecutive concepts by call reason → `analysis/E11a/e11.md`.
 - Pre-change copies for diffing: `experiments/E11_orig_modeling_sec.py.bak`, `experiments/E11_orig_vos_inference.py.bak`.
+
+## 2026-11-14 — fix: no duplicate frame in the MLLM memory (I5a)
+- `inference/modeling_sec.py` (`propagate_in_video`, bank update): a frame already in `mllm_memory` is not appended
+  again (`bank_reason = already_in_bank`). Only possible with `oracle_keyframes` (I5a put frame 10 in twice: GT mask
+  and the trigger's mask); with the original settings each frame is processed once, so behaviour is unchanged.

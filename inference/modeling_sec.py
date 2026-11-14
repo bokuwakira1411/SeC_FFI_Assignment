@@ -782,6 +782,9 @@ class SeCModel(PreTrainedModel):
                     _bank_reason = "empty_mask" if _bank_candidate else ""
                 elif current_out["object_score_logits"].item() <= bank_score_thresh:
                     _bank_reason = f"obj_score<={bank_score_thresh:g}" if _bank_candidate else ""
+                elif any(f == frame_idx for f, _, _ in mllm_memory):
+                    # already in the bank (e.g. an oracle keyframe): no duplicate frame
+                    _bank_reason = "already_in_bank" if _bank_candidate else ""
                 else:
                     mllm_memory.append((
                         frame_idx, Image.open(video_paths[frame_idx]).convert('RGB'),
