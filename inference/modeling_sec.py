@@ -4,6 +4,7 @@
 # Licensed under The MIT License [see LICENSE for details]
 # --------------------------------------------------------
 import os
+import time
 import warnings
 from typing import Any, List, Optional, Tuple, Union
 
@@ -119,7 +120,7 @@ class SeCModel(PreTrainedModel):
 
         use_flash_attn = use_flash_attn if has_flash_attn else False
         config.vision_config.use_flash_attn = True if use_flash_attn else False
-        config.llm_config._attn_implementation = 'flash_attention_2' if use_flash_attn else 'eager'
+        config.llm_config._attn_implementation = 'sdpa'  # patched: flash_attn not installed
 
         logger.info(f'num_image_token: {self.num_image_token}')
         logger.info(f'ps_version: {self.ps_version}')
@@ -170,7 +171,7 @@ class SeCModel(PreTrainedModel):
         
         # Compatible with previous versions
         if config.grounding_encoder_config == "longsam2.1/longsam2.1_hiera_l.yaml":
-            grounding_encoder_config == "sec_sam2.1_hiera_l.yaml"
+            grounding_encoder_config = "sec_sam2.1_hiera_l.yaml"
         else:
             grounding_encoder_config = config.grounding_encoder_config
         
@@ -358,6 +359,13 @@ class SeCModel(PreTrainedModel):
 
         input_embeds = input_embeds.reshape(B, N, C)
 
+        if labels is None:  # inference: only hidden states needed, skip lm_head logits (saves ~2-3 GB)
+            base = self.language_model.model(
+                inputs_embeds=input_embeds, attention_mask=attention_mask,
+                position_ids=position_ids, use_cache=False,
+                output_hidden_states=True, return_dict=True)
+            return CausalLMOutputWithPast(hidden_states=base.hidden_states)
+
         outputs = self.language_model(
             inputs_embeds=input_embeds,
             attention_mask=attention_mask,
@@ -523,7 +531,31 @@ class SeCModel(PreTrainedModel):
         init_mask=None,
         tokenizer=None,
         mllm_memory_size=7,
-    ):      
+        exp_ctx=None,
+    ):
+        # exp_ctx (experiments, see CHANGES.md): None = original behaviour. Otherwise a dict with
+        #   hsv_thresh (float), concept_mode ('default'|'off'|'always'|'swap'),
+        #   swap_concepts (list of saved language_embd tensors, for 'swap'),
+        #   rows (list, per-frame log rows are appended), concept_dir (save language_embd per trigger),
+        #   video, obj (names used in rows / concept file names),
+        #   bank_rule ('default': MLLM memory updated on frames where the concept was computed |
+        #              'hsv': only on frames with an HSV trigger, even if the concept is computed more often),
+        #   bank_extra_gap (int, 0 = off): also add other tracked frames that pass the same test
+        #              (mask not empty, object score > 1) if >= gap frames after the last added frame.
+        #   oracle_keyframes (list of (frame_idx, mask)): put into the MLLM memory from the start, after the
+        #              init frame (e.g. a later frame with its GT mask),
+        #   force_trigger (set of frame_idx): trigger the concept update on these frames whatever hsv_dist,
+        #   bank_score_thresh (float, default 1): object score a frame needs to enter the MLLM memory.
+        #   concept_every (int, 0 = off): also compute the concept on frames with frame_idx % N == 0.
+        hsv_thresh = 0.35 if exp_ctx is None else exp_ctx.get("hsv_thresh", 0.35)
+        concept_mode = "default" if exp_ctx is None else exp_ctx.get("concept_mode", "default")
+        exp_rows = None if exp_ctx is None else exp_ctx.get("rows")
+        n_triggers = 0
+        bank_rule = "default" if exp_ctx is None else exp_ctx.get("bank_rule", "default")
+        bank_gap = 0 if exp_ctx is None else exp_ctx.get("bank_extra_gap", 0)
+        force_trigger = set() if exp_ctx is None else set(exp_ctx.get("force_trigger") or ())
+        bank_score_thresh = 1 if exp_ctx is None else exp_ctx.get("bank_score_thresh", 1)
+        concept_every = 0 if exp_ctx is None else exp_ctx.get("concept_every", 0)
         if not self.init_prediction_config:
             assert tokenizer
             self.preparing_for_generation(tokenizer=tokenizer)
@@ -566,6 +598,10 @@ class SeCModel(PreTrainedModel):
 
 
         mllm_memory = [(start_frame_idx, Image.open(video_paths[start_frame_idx]).convert('RGB'), init_mask)]
+        for k, k_mask in ([] if exp_ctx is None else exp_ctx.get("oracle_keyframes") or []):
+            mllm_memory.append((k, Image.open(video_paths[k]).convert('RGB'), k_mask))
+        # experiments: frames used by the SAM 2 pixel memory (filled by _prepare_memory_conditioned_features)
+        self.grounding_encoder._exp_mem_frames = [] if exp_rows is not None else None
 
         for frame_idx in tqdm(processing_order, desc="propagate in video"):
             # We skip those frames already in consolidated outputs (these are frames
@@ -573,6 +609,15 @@ class SeCModel(PreTrainedModel):
             # batched forward on them via `_run_single_frame_inference` because the
             # number of clicks on each object might be different.
             _update_flag = False
+            _hsv_trig = False
+            _tracked = False
+            if exp_rows is not None:
+                torch.cuda.synchronize()
+                _t_frame = time.perf_counter()
+                _row = {"video": exp_ctx.get("video"), "obj": exp_ctx.get("obj"), "frame": frame_idx,
+                        "is_cond": 1, "hsv_dist": "", "triggered": 0, "mllm_memory_len": len(mllm_memory),
+                        "n_ctx_frames": 0, "predict_forward_ms": "", "ctx_frames": ""}
+                self.grounding_encoder._exp_mem_frames.clear()
             if frame_idx in consolidated_frame_inds["cond_frame_outputs"]:
                 storage_key = "cond_frame_outputs"
                 current_out = output_dict[storage_key][frame_idx]
@@ -602,22 +647,54 @@ class SeCModel(PreTrainedModel):
                 
                 current_img = Image.open(video_paths[frame_idx]).convert('RGB')
                 last_img = Image.open(video_paths[frame_idx-1]).convert('RGB')
-                flags = [is_scene_change_hsv(current_img, last_img)]
+                hsv_dist = hsv_distance(current_img, last_img)
+                _hsv_trig = bool(hsv_dist > hsv_thresh)
+                _tracked = True
+                flags = [hsv_dist > hsv_thresh]  # == is_scene_change_hsv(current_img, last_img) by default
+                if concept_mode == "off":
+                    flags = [False]
+                elif concept_mode == "always":
+                    flags = [True]
+                if frame_idx in force_trigger:
+                    flags = [True]
+                elif concept_every > 0 and frame_idx % concept_every == 0:
+                    flags = [True]
                 if len(mllm_memory) > mllm_memory_size:
                     _mllm_memory = [mllm_memory[0]] + mllm_memory[-(mllm_memory_size-1):]
                 else:
                     _mllm_memory = mllm_memory
-                
+                if exp_rows is not None:
+                    _row.update(is_cond=0, hsv_dist=round(float(hsv_dist), 5))
+
                 if False in flags:
                     _update_flag = False
                     language_embd = None
+                elif concept_mode == "swap":
+                    # concept taken from another object (fixed mapping); the MLLM is not called
+                    _update_flag = True
+                    swap = exp_ctx["swap_concepts"]
+                    language_embd = swap[n_triggers % len(swap)].to(self.device)
+                    n_triggers += 1
                 else:
                     _update_flag = True
                     video = [label_img_with_mask(img, mask) for _, img, mask in _mllm_memory]
                     video.append(current_img)
                     text = "<image>Please segment the object in the last frame based on the object labeled in the first several images."
+                    if exp_rows is not None:
+                        torch.cuda.synchronize()
+                        _t_pf = time.perf_counter()
                     specific_language_embd = self.predict_forward(video=video, text=text)
                     language_embd = specific_language_embd.unsqueeze(0)
+                    if exp_rows is not None:
+                        torch.cuda.synchronize()
+                        _row["predict_forward_ms"] = round((time.perf_counter() - _t_pf) * 1000, 2)
+                    if exp_ctx is not None and exp_ctx.get("concept_dir"):
+                        torch.save(language_embd.detach().cpu(), os.path.join(
+                            exp_ctx["concept_dir"], f"{exp_ctx['video']}_{exp_ctx['obj']}_{frame_idx:05d}.pt"))
+                    n_triggers += 1
+                if exp_rows is not None and _update_flag:
+                    _row.update(triggered=1, n_ctx_frames=len(_mllm_memory),
+                                ctx_frames=" ".join(str(f) for f, _, _ in _mllm_memory))
 
 
                 current_out, pred_masks = self.grounding_encoder._run_single_frame_inference(
@@ -643,13 +720,44 @@ class SeCModel(PreTrainedModel):
             _, video_res_masks = self.grounding_encoder._get_orig_video_res_output(
                 inference_state, pred_masks
             )
-            if _update_flag and (video_res_masks[0] > 0.0).sum() != 0 and current_out["object_score_logits"].item() > 1:
-                mllm_memory.append((
-                    frame_idx, Image.open(video_paths[frame_idx]).convert('RGB'),
-                    (video_res_masks[0] > 0.0).cpu().numpy()
-                ))
+            # MLLM memory update. Original rule (bank_rule='default', bank_gap=0): a frame where the concept
+            # was computed is added if its mask is not empty and its object score > 1.
+            _mem_appended = 0
+            _bank_reason = ""
+            _bank_candidate = _hsv_trig if bank_rule == "hsv" else _update_flag
+            _periodic = (not _bank_candidate and _tracked and bank_gap > 0
+                         and frame_idx - mllm_memory[-1][0] >= bank_gap)
+            if _bank_candidate or _periodic:
+                if (video_res_masks[0] > 0.0).sum() == 0:
+                    _bank_reason = "empty_mask" if _bank_candidate else ""
+                elif current_out["object_score_logits"].item() <= bank_score_thresh:
+                    _bank_reason = f"obj_score<={bank_score_thresh:g}" if _bank_candidate else ""
+                else:
+                    mllm_memory.append((
+                        frame_idx, Image.open(video_paths[frame_idx]).convert('RGB'),
+                        (video_res_masks[0] > 0.0).cpu().numpy()
+                    ))
+                    _mem_appended = 1
+                    _bank_reason = "added" if _bank_candidate else "added_periodic"
+            if exp_rows is not None:
+                torch.cuda.synchronize()
+                ious = current_out.get("ious")
+                obj_score = current_out.get("object_score_logits")
+                _row.update(
+                    hsv_trigger=int(_hsv_trig),
+                    mem_appended=_mem_appended,
+                    bank_reason=_bank_reason,
+                    mask_px=int((video_res_masks[0] > 0.0).sum()),
+                    pred_iou=round(float(ious.float().max()), 5) if ious is not None else "",
+                    object_score_logit=round(float(obj_score.float().max()), 5) if obj_score is not None else "",
+                    frame_ms=round((time.perf_counter() - _t_frame) * 1000, 2),
+                    bank_frames=" ".join(str(f) for f, _, _ in mllm_memory),
+                    sam_mem_frames=" ".join(str(f) for f in self.grounding_encoder._exp_mem_frames),
+                )
+                exp_rows.append(_row)
             yield frame_idx, obj_ids, video_res_masks
-        
+        self.grounding_encoder._exp_mem_frames = None
+
     def predict_forward(
         self,
         image=None,
@@ -730,6 +838,11 @@ def label_img_with_mask(img, mask):
     return frame
 
 def is_scene_change_hsv(img1, img2, threshold=0.35):
+    return hsv_distance(img1, img2) > threshold
+
+
+def hsv_distance(img1, img2):
+    """Bhattacharyya distance between H-S histograms (body of the original is_scene_change_hsv)."""
     img1 = cv2.resize(np.array(img1), (1024, 1024))
     img2 = cv2.resize(np.array(img2), (1024, 1024))
 
@@ -743,7 +856,7 @@ def is_scene_change_hsv(img1, img2, threshold=0.35):
 
     distance = cv2.compareHist(hist1, hist2, cv2.HISTCMP_BHATTACHARYYA)
 
-    return distance > threshold
+    return distance
 
 
 def find_closest_aspect_ratio(aspect_ratio, target_ratios, width, height,

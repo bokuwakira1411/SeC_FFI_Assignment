@@ -1,0 +1,106 @@
+--- a/inference/modeling_sec.py
++++ b/inference/modeling_sec.py
+@@ -547,6 +547,10 @@
+         #   force_trigger (set of frame_idx): trigger the concept update on these frames whatever hsv_dist,
+         #   bank_score_thresh (float, default 1): object score a frame needs to enter the MLLM memory.
+         #   concept_every (int, 0 = off): also compute the concept on frames with frame_idx % N == 0.
++        #   burst_after_trigger (int K, 0 = off): also compute the concept on the K tracked frames after each HSV
++        #              trigger (a new trigger during a burst restarts the count),
++        #   concept_every_sparse (int P, 0 = off): outside bursts, also compute the concept when the last
++        #              concept call (or the start frame) is >= P frames back.
+         hsv_thresh = 0.35 if exp_ctx is None else exp_ctx.get("hsv_thresh", 0.35)
+         concept_mode = "default" if exp_ctx is None else exp_ctx.get("concept_mode", "default")
+         exp_rows = None if exp_ctx is None else exp_ctx.get("rows")
+@@ -556,6 +560,8 @@
+         force_trigger = set() if exp_ctx is None else set(exp_ctx.get("force_trigger") or ())
+         bank_score_thresh = 1 if exp_ctx is None else exp_ctx.get("bank_score_thresh", 1)
+         concept_every = 0 if exp_ctx is None else exp_ctx.get("concept_every", 0)
++        burst_after = 0 if exp_ctx is None else exp_ctx.get("burst_after_trigger", 0)
++        sparse_every = 0 if exp_ctx is None else exp_ctx.get("concept_every_sparse", 0)
+         if not self.init_prediction_config:
+             assert tokenizer
+             self.preparing_for_generation(tokenizer=tokenizer)
+@@ -597,6 +603,7 @@
+             processing_order = range(start_frame_idx, end_frame_idx + 1)
+ 
+ 
++        _burst_left, _last_call = 0, start_frame_idx  # burst_after_trigger / concept_every_sparse state
+         mllm_memory = [(start_frame_idx, Image.open(video_paths[start_frame_idx]).convert('RGB'), init_mask)]
+         for k, k_mask in ([] if exp_ctx is None else exp_ctx.get("oracle_keyframes") or []):
+             mllm_memory.append((k, Image.open(video_paths[k]).convert('RGB'), k_mask))
+@@ -659,6 +666,17 @@
+                     flags = [True]
+                 elif concept_every > 0 and frame_idx % concept_every == 0:
+                     flags = [True]
++                _reason = "hsv" if flags == [True] and _hsv_trig else ("other" if flags == [True] else "")
++                if _hsv_trig:
++                    _burst_left = burst_after
++                elif _burst_left > 0:
++                    _burst_left -= 1
++                    if flags != [True]:
++                        flags, _reason = [True], "burst"
++                elif sparse_every > 0 and frame_idx - _last_call >= sparse_every and flags != [True]:
++                    flags, _reason = [True], "sparse"
++                if flags == [True]:
++                    _last_call = frame_idx
+                 if len(mllm_memory) > mllm_memory_size:
+                     _mllm_memory = [mllm_memory[0]] + mllm_memory[-(mllm_memory_size-1):]
+                 else:
+@@ -693,7 +711,7 @@
+                             exp_ctx["concept_dir"], f"{exp_ctx['video']}_{exp_ctx['obj']}_{frame_idx:05d}.pt"))
+                     n_triggers += 1
+                 if exp_rows is not None and _update_flag:
+-                    _row.update(triggered=1, n_ctx_frames=len(_mllm_memory),
++                    _row.update(triggered=1, n_ctx_frames=len(_mllm_memory), concept_reason=_reason,
+                                 ctx_frames=" ".join(str(f) for f, _, _ in _mllm_memory))
+ 
+ 
+--- a/vos_evaluation/vos_inference.py
++++ b/vos_evaluation/vos_inference.py
+@@ -222,6 +222,8 @@
+                 rows=exp_cfg["rows"], concept_dir=exp_cfg["concept_dir"],
+                 bank_rule=exp_cfg["bank_rule"], bank_extra_gap=exp_cfg["bank_extra_gap"],
+                 concept_every=exp_cfg["concept_every"],
++                burst_after_trigger=exp_cfg["burst_after_trigger"],
++                concept_every_sparse=exp_cfg["concept_every_sparse"],
+                 force_trigger=exp_cfg["force_trigger"], bank_score_thresh=exp_cfg["bank_score_thresh"],
+             )
+             if exp_cfg["oracle_keyframe"] is not None:
+@@ -306,7 +308,7 @@
+     fields = ["video", "obj", "frame", "is_cond", "hsv_dist", "hsv_trigger", "triggered",
+               "mllm_memory_len", "n_ctx_frames", "mem_appended", "bank_reason", "mask_px", "pred_iou",
+               "object_score_logit", "predict_forward_ms", "frame_ms",
+-              "ctx_frames", "bank_frames", "sam_mem_frames"]
++              "ctx_frames", "bank_frames", "sam_mem_frames", "concept_reason"]
+     with open(os.path.join(exp_log_dir, "frames", f"{video_name}.csv"), "w", newline="") as f:
+         w = csv.DictWriter(f, fieldnames=fields)
+         w.writeheader()
+@@ -434,6 +436,12 @@
+     parser.add_argument("--concept_every", type=int, default=0,
+                         help=">0: also compute the concept on frames with frame_idx %% N == 0 "
+                              "(HSV triggers still apply); 0 = off")
++    parser.add_argument("--burst_after_trigger", type=int, default=0,
++                        help=">0: also compute the concept on the K tracked frames after each HSV trigger "
++                             "(a new trigger restarts the count); 0 = off")
++    parser.add_argument("--concept_every_sparse", type=int, default=0,
++                        help=">0: outside bursts, also compute the concept when the last concept call is "
++                             ">= P frames back; 0 = off")
+     parser.add_argument("--oracle_keyframe", type=int, default=None,
+                         help="put this frame with its GT mask into the MLLM memory from the start")
+     parser.add_argument("--force_trigger", type=str, default="",
+@@ -447,6 +455,7 @@
+         assert args.swap_map, "--concept_mode swap needs --swap_map"
+     use_exp = (args.exp_log_dir is not None or args.concept_mode != "default" or args.hsv_thresh != 0.35
+                or args.bank_rule != "default" or args.bank_extra_gap != 0 or args.concept_every != 0
++               or args.burst_after_trigger != 0 or args.concept_every_sparse != 0
+                or args.oracle_keyframe is not None or args.force_trigger or args.bank_score_thresh != 1.0)
+     force_trigger = set()
+     for part in filter(None, args.force_trigger.split(",")):
+@@ -516,6 +525,7 @@
+                 hsv_thresh=args.hsv_thresh, concept_mode=args.concept_mode, swap_map=swap_map,
+                 bank_rule=args.bank_rule, bank_extra_gap=args.bank_extra_gap,
+                 concept_every=args.concept_every,
++                burst_after_trigger=args.burst_after_trigger, concept_every_sparse=args.concept_every_sparse,
+                 oracle_keyframe=args.oracle_keyframe, force_trigger=force_trigger,
+                 bank_score_thresh=args.bank_score_thresh,
+                 rows=[] if args.exp_log_dir else None,

@@ -1,10 +1,31 @@
 __pycache__/
 .DS_Store
 
-dataset/SA-V
-pretrained_models/*InternVL*
-pretrained_models/*.pt
+SeC/dataset/SA-V
+/pretrained_models/*InternVL*
+/pretrained_models/*.pt
 
-work_dirs/
-saved_models/
-vos_inference_*.sh
+/work_dirs/
+/saved_models/
+/vos_inference_*.sh
+# --- SeCVOS local run ---
+# dataset (1.6 GB) and model weights (saved_models/ above, 15 GB)
+/data/
+# predicted masks + MP4 visualisations; keep only the evaluator CSVs
+/outputs/*
+!/outputs/secvos_full/
+/outputs/secvos_full/*
+!/outputs/secvos_full/results_*.csv
+*.mp4
+# raw inference log (1.5 MB, OOM tracebacks)
+/logs_secvos.txt
+/SeC/experiments/D0/masks/
+/experiments/D0/masks/
+/experiments/E0/masks/
+/experiments/E0/concepts/
+/experiments/E0r/masks/
+/experiments/E10a/concepts/
+/experiments/E10a/masks/
+/experiments/E1/masks/
+/experiments/E1/concepts/
+

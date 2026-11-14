@@ -136,6 +136,14 @@ class SAM2VideoPredictor(_SAM2VideoPredictor):
                     out = unselected_cond_outputs.get(prev_frame_idx, None)
                 t_pos_and_prevs.append((t_pos, out))
 
+            # experiments (see CHANGES.md): record which frames the pixel memory uses; off unless the
+            # caller sets self._exp_mem_frames to a list
+            if getattr(self, "_exp_mem_frames", None) is not None:
+                self._exp_mem_frames[:] = sorted(selected_cond_outputs) + [
+                    valid_indices[t_pos - self.num_maskmem]
+                    for t_pos, prev in t_pos_and_prevs[len(selected_cond_outputs):] if prev is not None
+                ]
+
             for t_pos, prev in t_pos_and_prevs:
                 if prev is None:
                     continue  # skip padding frames

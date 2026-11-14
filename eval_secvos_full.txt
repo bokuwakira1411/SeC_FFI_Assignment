@@ -1,0 +1,27 @@
+
+first_segment Summary:
+Global score: J&F: 84.0 J: 83.7 F: 84.4
+Time taken: 5.61s
+Saving the results to outputs/secvos_full/results_first_segment.csv
+
+
+second_segment Summary:
+Global score: J&F: 69.8 J: 69.7 F: 69.9
+Time taken: 4.08s
+Saving the results to outputs/secvos_full/results_second_segment.csv
+
+
+remain_segments Summary:
+Global score: J&F: 67.5 J: 67.1 F: 68.0
+Time taken: 7.95s
+Saving the results to outputs/secvos_full/results_remain_segments.csv
+
+We are *SKIPPING* the evaluation of the first and the last frame (standard for semi-supervised video object segmentation).
+In dataset data/SeCVOS/Annotations, we are evaluating on 160 videos: ['-klPo9pilc4', '-nIt1BX3DFY', '09trCkd99Os', '0D27yQy-qWk', '0HgnueqXKyU', '0Jn5N_pmZuA', '0SVMNRIKTaw', '0ZcDkQX6WFE', '0kibzqZ4Fe8', '0waHmuWSPZo', '1AtGI9kSzpY', '290cMhsTCVM', '2UNKqQHG4gA', '2yFGHfV4L6U', '3qIRJLGGZy0', '42GofA15N3M', '4AxWuk52ZUQ', '4glQyjzXgrE', '4i-xiG8a13Q', '4xB9ab4QUiw', '5a45aSpta88', '63HFjBi0oAQ', '650oOOyEKG4', '6BIvQHzdIC0', '6ihbDGFbajc', '6mOZBTdzOj0', '854xZGo5pQw', '8CUa81t4H5s', '8a6_6LWj3FY', '9-P4pMS6F2c', 'AeP2Dwree4M', 'BPNi5dTHwKM', 'BU-wIj--VWs', 'BpSmYQvR8cA', 'BuRf6r0LuL8', 'C-NDP5g2ERQ', 'C5ELpD4OZGM', 'CKmkgzeNKZw', 'CKrV4mwTka0', 'Cgj-gtEj8fU', 'Crf2aApb0yw', 'DBDUDgCG-94', 'DGcdKA7159E', 'DebmDk-weKs', 'DqC3ieJJlFM', 'EFgdx_t4baQ', 'EO-KsZYeHRA', 'E_UbFKdWFl4', 'EoQaVBlutWw', 'FIIKq3MBCg0', 'FRNZQHmo_Ig', 'FhkXz51WsCg', 'FmHI0ar0EvE', 'FsLaTZmP6Uw', 'GDoI16RmxqQ', 'GKqdC_xcf28', 'GMnti60Gxgc', 'Gcmn73sImtQ', 'Gq-DY2iiqbc', 'H7hkYP9CeSk', 'HC-XSzO3rrE', 'HPTVnL0FN2o', 'HmHjI9Z_vbI', 'IR6V_6xqWDU', 'IaiKA_fh_q0', 'IppaafjwUUA', 'JAkIt2GhWF0', 'JF7co5M06kY', 'JJNUDzMqeFU', 'JTtcExfeKi0', 'Jo9zeWfXYHA', 'K9U5YEQy1H8', 'KHdxZ-p1Uho', 'KKxyz7YPED4', 'KNAXihfJirw', 'KYt8h7ydprA', 'K_cVTBY0NoE', 'Ki4QY8G6eWo', 'LFpk448qjKQ', 'M0WeiG2-HRQ', 'MDDtQoaj6sA', 'MF7FK-3Kg3A', 'MTQGzgPMqoc', 'N_KKXG5NZdg', 'NdV-EAKV0Hk', 'Nm1Sg55z7-Y', 'OFVRaOdgV1Y', 'OMRcjXvgZPs', 'P2T9tuPJXks', 'R62X_YI1WM4', 'RERWmKSQlIc', 'RwKp4kBZJBk', 'VGa1imApfdg', 'VPDTiVzTdD4', 'VbWbRDgphqo', 'Vv4H2cE9C2M', 'W44PFMXuy_Q', 'WZIqYnAlX-4', 'W_fDreXpw10', 'XE6PuQ71Yw0', 'XNhwsl_fQdw', 'YfSpfijoxYw', 'YlbXLJz19ew', 'YylYt0hUz68', 'Z0xRnXtOJIQ', 'Z67iU_mcLto', '_-8CxcfLZq4', '_1lwKMz9W50', '_2p9-pm8Lys', '_344KrvLlSg', '_H00-2zCavQ', '_Z5NkURnkHg', '_cOkXIkVz1g', '_wHdDwk0Uns', 'aP2up9N6H-g', 'aYO2eRIFjQs', 'bp6hhq8DdgU', 'cEu8y56ywXQ', 'cIX8usnGj7s', 'cWT3nqCoK_w', 'ccj3faULpKw', 'cfIH74Dotok', 'cw5P5iAJ3Xw', 'cwCnelwB8xQ', 'cwb2y51L4oE', 'cx_SJOuYjls', 'd2mJr5-tiiQ', 'dIuH0AhcX5Q', 'dL7gKaqaJuc', 'dMv3NFJVmBE', 'eD77593mOq8', 'eDqSDr7GDB8', 'eG9ckwyPpwg', 'ecxHo0yITZk', 'ehq7OfDUAH8', 'ekr2nIex040', 'evGz9QWFhnQ', 'fbVU5kL8LP0', 'fzaZPPJmgFU', 'ghayJozH0iA', 'hGI8iYjk0rc', 'hLZFitoJPe8', 'i6Y76KPy6XQ', 'iZU-pu4I798', 'j30W5UQaU-A', 'jD-IamlOhe8', 'jPZUdGVY_m8', 'kIkv_oA-cQA', 'kMcn1Af1sD4', 'kVJbxV62jqQ', 'lKsyz336zNw', 'lfi6LcEFJCM', 'ltNiyjUvXiw', 'mGkTa8gcANY', 'nkn5UcXDlIg', 'nxC4ON_D0fI', 'sj79iKzCuzI', 'uWq8RebJeOc', 'wXXlIuD8Fo8', 'wvBybjJRRHg']
+  0%|          | 0/160 [00:00<?, ?it/s]  1%|          | 1/160 [00:03<09:14,  3.49s/it]  9%|▉         | 15/160 [00:05<00:39,  3.67it/s] 26%|██▋       | 42/160 [00:05<00:11, 10.22it/s] 31%|███▏      | 50/160 [00:06<00:09, 11.19it/s] 32%|███▎      | 52/160 [00:08<00:18,  5.91it/s] 58%|█████▊    | 93/160 [00:09<00:04, 13.62it/s] 61%|██████    | 97/160 [00:10<00:04, 13.99it/s] 62%|██████▏   | 99/160 [00:11<00:06,  9.97it/s] 78%|███████▊  | 124/160 [00:11<00:01, 19.58it/s] 82%|████████▎ | 132/160 [00:12<00:02, 13.97it/s] 86%|████████▋ | 138/160 [00:14<00:02,  8.73it/s]100%|██████████| 160/160 [00:16<00:00, 10.39it/s]100%|██████████| 160/160 [00:16<00:00,  9.86it/s]
+
+overall Summary:
+Global score: J&F: 69.9 J: 69.7 F: 70.2
+Time taken: 16.23s
+Saving the results to outputs/secvos_full/results_overall.csv
+

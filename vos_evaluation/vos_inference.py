@@ -5,7 +5,10 @@
 # LICENSE file in the root directory of this source tree.
 
 import argparse
+import csv
+import json
 import os
+import time
 from collections import defaultdict
 
 import numpy as np
@@ -145,9 +148,13 @@ def vos_separate_inference_per_object(
     score_thresh=0.0,
     use_all_masks=False,
     per_obj_png_file=False,
+    exp_cfg=None,
 ):
     """
     Run VOS inference on a single video with the given predictor.
+
+    exp_cfg (experiments, see CHANGES.md): None = original behaviour. Otherwise a dict with
+    hsv_thresh, concept_mode, swap_map, concept_dir, rows; a per-object exp_ctx is built from it.
 
     Unlike `vos_inference`, this function run inference separately for each object
     in a video, which could be applied to datasets like LVOS or YouTube-VOS that
@@ -163,7 +170,7 @@ def vos_separate_inference_per_object(
     ]
     frame_names.sort(key=lambda p: int(os.path.splitext(p)[0]))
     inference_state = predictor.grounding_encoder.init_state(
-        video_path=video_dir, async_loading_frames=False
+        video_path=video_dir, async_loading_frames=False, offload_video_to_cpu=True
     )
     height = inference_state["video_height"]
     width = inference_state["video_width"]
@@ -206,6 +213,29 @@ def vos_separate_inference_per_object(
                 obj_id=object_id,
                 mask=inputs_per_object[object_id][input_frame_idx],
             )
+        exp_ctx = None
+        if exp_cfg is not None:
+            obj_name = f"{object_id:03d}" if per_obj_png_file else str(object_id)
+            exp_ctx = dict(
+                video=video_name, obj=obj_name,
+                hsv_thresh=exp_cfg["hsv_thresh"], concept_mode=exp_cfg["concept_mode"],
+                rows=exp_cfg["rows"], concept_dir=exp_cfg["concept_dir"],
+                bank_rule=exp_cfg["bank_rule"], bank_extra_gap=exp_cfg["bank_extra_gap"],
+                concept_every=exp_cfg["concept_every"],
+                force_trigger=exp_cfg["force_trigger"], bank_score_thresh=exp_cfg["bank_score_thresh"],
+            )
+            if exp_cfg["oracle_keyframe"] is not None:
+                k = exp_cfg["oracle_keyframe"]
+                k_masks, _ = load_masks_from_dir(
+                    input_mask_dir=input_mask_dir, video_name=video_name, frame_name=frame_names[k],
+                    per_obj_png_file=per_obj_png_file, allow_missing=True,
+                )
+                assert np.any(k_masks.get(object_id)), f"oracle keyframe {k}: empty GT mask for {object_id}"
+                exp_ctx["oracle_keyframes"] = [(k, k_masks[object_id])]
+            if exp_cfg["concept_mode"] == "swap":
+                exp_ctx["swap_concepts"] = [
+                    torch.load(f) for f in exp_cfg["swap_map"][f"{video_name}_{obj_name}"]
+                ]
         # run propagation throughout the video and collect the results in a dict
         for out_frame_idx, _, out_mask_logits in predictor.propagate_in_video(
             inference_state,
@@ -213,6 +243,7 @@ def vos_separate_inference_per_object(
             reverse=False,
             init_mask=inputs_per_object[object_id][min(input_frame_inds)],
             tokenizer=tokenizer,
+            exp_ctx=exp_ctx,
         ):
             obj_scores = out_mask_logits.cpu().numpy()
             output_scores_per_object[object_id][out_frame_idx] = obj_scores
@@ -253,6 +284,46 @@ def vos_separate_inference_per_object(
             per_obj_png_file=per_obj_png_file,
             output_palette=output_palette,
         )
+
+def video_output_complete(base_video_dir, input_mask_dir, output_mask_dir, video_name):
+    """True if every GT object of the video has one output PNG per input frame."""
+    n_frames = sum(f.lower().endswith((".jpg", ".jpeg"))
+                   for f in os.listdir(os.path.join(base_video_dir, video_name)))
+    out_dir = os.path.join(output_mask_dir, video_name)
+    gt_dir = os.path.join(input_mask_dir, video_name)
+    if not os.path.isdir(out_dir):
+        return False
+    gt_objs = [o for o in os.listdir(gt_dir) if os.path.isdir(os.path.join(gt_dir, o))]
+    return all(
+        os.path.isdir(os.path.join(out_dir, o))
+        and sum(f.endswith(".png") for f in os.listdir(os.path.join(out_dir, o))) == n_frames
+        for o in gt_objs
+    )
+
+
+def write_exp_logs(exp_log_dir, video_name, rows, video_sec, n_done, n_total):
+    """Per-frame CSV for one video, one line in videos.csv, one line in progress.txt."""
+    fields = ["video", "obj", "frame", "is_cond", "hsv_dist", "hsv_trigger", "triggered",
+              "mllm_memory_len", "n_ctx_frames", "mem_appended", "bank_reason", "mask_px", "pred_iou",
+              "object_score_logit", "predict_forward_ms", "frame_ms",
+              "ctx_frames", "bank_frames", "sam_mem_frames"]
+    with open(os.path.join(exp_log_dir, "frames", f"{video_name}.csv"), "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+        w.writerows(rows)
+    n_obj = len({r["obj"] for r in rows})
+    n_frames = len({r["frame"] for r in rows})
+    n_trig = sum(int(r["triggered"]) for r in rows)
+    videos_csv = os.path.join(exp_log_dir, "videos.csv")
+    new = not os.path.exists(videos_csv)
+    with open(videos_csv, "a") as f:
+        if new:
+            f.write("video,n_obj,n_frames,n_obj_frames,n_triggers,video_sec\n")
+        f.write(f"{video_name},{n_obj},{n_frames},{len(rows)},{n_trig},{video_sec:.2f}\n")
+    with open(os.path.join(exp_log_dir, "progress.txt"), "a") as f:
+        f.write(f"{time.strftime('%F %T')} {n_done}/{n_total} {video_name} "
+                f"obj={n_obj} frames={n_frames} triggers={n_trig} {video_sec:.1f}s\n")
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -342,7 +413,50 @@ def main():
         default=1,
         help="the number of node (8 cards) used",
     )
+    # --- experiments (see CHANGES.md); defaults reproduce the original behaviour ---
+    parser.add_argument("--hsv_thresh", type=float, default=0.35,
+                        help="HSV scene-change threshold that triggers the concept (MLLM) update")
+    parser.add_argument("--concept_mode", default="default",
+                        choices=["default", "off", "always", "swap"],
+                        help="off: never trigger; always: trigger on every frame; "
+                             "swap: on trigger use concepts listed in --swap_map")
+    parser.add_argument("--swap_map", type=str, default=None,
+                        help="json {'<video>_<obj>': [concept .pt files]} for --concept_mode swap")
+    parser.add_argument("--exp_log_dir", type=str, default=None,
+                        help="write per-frame CSV (frames/<video>.csv), videos.csv and progress.txt here")
+    parser.add_argument("--save_concepts", action="store_true",
+                        help="save language_embd at every trigger to <exp_log_dir>/concepts/")
+    parser.add_argument("--bank_rule", default="default", choices=["default", "hsv"],
+                        help="hsv: MLLM memory updated only on HSV-trigger frames (even with --concept_mode always)")
+    parser.add_argument("--bank_extra_gap", type=int, default=0,
+                        help=">0: also add non-trigger frames (mask not empty, object score > 1) "
+                             "at least this many frames after the last added frame; 0 = off")
+    parser.add_argument("--concept_every", type=int, default=0,
+                        help=">0: also compute the concept on frames with frame_idx %% N == 0 "
+                             "(HSV triggers still apply); 0 = off")
+    parser.add_argument("--oracle_keyframe", type=int, default=None,
+                        help="put this frame with its GT mask into the MLLM memory from the start")
+    parser.add_argument("--force_trigger", type=str, default="",
+                        help="frames where the concept update is forced, e.g. '10-30,45'")
+    parser.add_argument("--bank_score_thresh", type=float, default=1.0,
+                        help="object score a trigger frame needs to enter the MLLM memory (original: 1)")
+    parser.add_argument("--skip_done", action="store_true",
+                        help="skip videos whose output masks are already complete (resume)")
     args = parser.parse_args()
+    if args.concept_mode == "swap":
+        assert args.swap_map, "--concept_mode swap needs --swap_map"
+    use_exp = (args.exp_log_dir is not None or args.concept_mode != "default" or args.hsv_thresh != 0.35
+               or args.bank_rule != "default" or args.bank_extra_gap != 0 or args.concept_every != 0
+               or args.oracle_keyframe is not None or args.force_trigger or args.bank_score_thresh != 1.0)
+    force_trigger = set()
+    for part in filter(None, args.force_trigger.split(",")):
+        a, _, b = part.partition("-")
+        force_trigger.update(range(int(a), int(b or a) + 1))
+    if args.exp_log_dir is not None:
+        os.makedirs(os.path.join(args.exp_log_dir, "frames"), exist_ok=True)
+        if args.save_concepts:
+            os.makedirs(os.path.join(args.exp_log_dir, "concepts"), exist_ok=True)
+    swap_map = json.load(open(args.swap_map)) if args.swap_map else None
 
     # if we use per-object PNG files, they could possibly overlap in inputs and outputs
     hydra_overrides_extra = [
@@ -391,6 +505,25 @@ def main():
 
     for n_video, video_name in enumerate(video_names):
         print(f"\n{n_video + 1}/{len(video_names)} - running on {video_name}")
+        if args.skip_done and video_output_complete(
+            args.base_video_dir, args.input_mask_dir, args.output_mask_dir, video_name
+        ):
+            print(f"skip {video_name}: output already complete")
+            continue
+        exp_cfg = None
+        if use_exp:
+            exp_cfg = dict(
+                hsv_thresh=args.hsv_thresh, concept_mode=args.concept_mode, swap_map=swap_map,
+                bank_rule=args.bank_rule, bank_extra_gap=args.bank_extra_gap,
+                concept_every=args.concept_every,
+                oracle_keyframe=args.oracle_keyframe, force_trigger=force_trigger,
+                bank_score_thresh=args.bank_score_thresh,
+                rows=[] if args.exp_log_dir else None,
+                concept_dir=os.path.join(args.exp_log_dir, "concepts")
+                if (args.exp_log_dir and args.save_concepts) else None,
+            )
+        torch.cuda.synchronize()
+        t_video = time.perf_counter()
         if not args.track_object_appearing_later_in_video:
             raise NotImplementedError
         else:
@@ -404,7 +537,13 @@ def main():
                 score_thresh=args.score_thresh,
                 use_all_masks=args.use_all_masks,
                 per_obj_png_file=args.per_obj_png_file,
+                exp_cfg=exp_cfg,
             )
+        torch.cuda.synchronize()
+        video_sec = time.perf_counter() - t_video
+        if args.exp_log_dir:
+            write_exp_logs(args.exp_log_dir, video_name, exp_cfg["rows"], video_sec,
+                           n_video + 1, len(video_names))
 
     print(
         f"completed VOS prediction on {len(video_names)} videos -- "
