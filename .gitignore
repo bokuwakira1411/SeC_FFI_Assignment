@@ -29,3 +29,5 @@ SeC/dataset/SA-V
 /experiments/E1/masks/
 /experiments/E1/concepts/
 
+/experiments/*/masks/
+/experiments/*/concepts/

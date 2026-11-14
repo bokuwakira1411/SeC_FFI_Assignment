@@ -222,6 +222,11 @@ def vos_separate_inference_per_object(
                 rows=exp_cfg["rows"], concept_dir=exp_cfg["concept_dir"],
                 bank_rule=exp_cfg["bank_rule"], bank_extra_gap=exp_cfg["bank_extra_gap"],
                 concept_every=exp_cfg["concept_every"],
+                burst_after_trigger=exp_cfg["burst_after_trigger"],
+                concept_every_sparse=exp_cfg["concept_every_sparse"],
+                trigger_mode=exp_cfg["trigger_mode"], unc_logit_drop=exp_cfg["unc_logit_drop"],
+                unc_area_drop=exp_cfg["unc_area_drop"], unc_empty_n=exp_cfg["unc_empty_n"],
+                unc_window=exp_cfg["unc_window"], unc_cooldown=exp_cfg["unc_cooldown"],
                 force_trigger=exp_cfg["force_trigger"], bank_score_thresh=exp_cfg["bank_score_thresh"],
             )
             if exp_cfg["oracle_keyframe"] is not None:
@@ -306,7 +311,7 @@ def write_exp_logs(exp_log_dir, video_name, rows, video_sec, n_done, n_total):
     fields = ["video", "obj", "frame", "is_cond", "hsv_dist", "hsv_trigger", "triggered",
               "mllm_memory_len", "n_ctx_frames", "mem_appended", "bank_reason", "mask_px", "pred_iou",
               "object_score_logit", "predict_forward_ms", "frame_ms",
-              "ctx_frames", "bank_frames", "sam_mem_frames"]
+              "ctx_frames", "bank_frames", "sam_mem_frames", "concept_reason"]
     with open(os.path.join(exp_log_dir, "frames", f"{video_name}.csv"), "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
@@ -434,6 +439,23 @@ def main():
     parser.add_argument("--concept_every", type=int, default=0,
                         help=">0: also compute the concept on frames with frame_idx %% N == 0 "
                              "(HSV triggers still apply); 0 = off")
+    parser.add_argument("--burst_after_trigger", type=int, default=0,
+                        help=">0: also compute the concept on the K tracked frames after each HSV trigger "
+                             "(a new trigger restarts the count); 0 = off")
+    parser.add_argument("--concept_every_sparse", type=int, default=0,
+                        help=">0: outside bursts, also compute the concept when the last concept call is "
+                             ">= P frames back; 0 = off")
+    parser.add_argument("--trigger_mode", default="hsv", choices=["hsv", "unc", "hsv_or_unc"],
+                        help="concept-call trigger: hsv (original) | unc (uncertainty only) | hsv_or_unc")
+    parser.add_argument("--unc_logit_drop", type=float, default=None,
+                        help="uncertainty S1: object score logit drops > D below the mean of the previous w frames")
+    parser.add_argument("--unc_area_drop", type=float, default=None,
+                        help="uncertainty S2: mask area drops > r (fraction) below the mean of the previous w frames")
+    parser.add_argument("--unc_empty_n", type=int, default=0,
+                        help="uncertainty S3: mask empty on the last N frames; 0 = off")
+    parser.add_argument("--unc_window", type=int, default=5, help="w for S1/S2")
+    parser.add_argument("--unc_cooldown", type=int, default=0,
+                        help="no uncertainty call if the last concept call is <= C frames back")
     parser.add_argument("--oracle_keyframe", type=int, default=None,
                         help="put this frame with its GT mask into the MLLM memory from the start")
     parser.add_argument("--force_trigger", type=str, default="",
@@ -447,6 +469,8 @@ def main():
         assert args.swap_map, "--concept_mode swap needs --swap_map"
     use_exp = (args.exp_log_dir is not None or args.concept_mode != "default" or args.hsv_thresh != 0.35
                or args.bank_rule != "default" or args.bank_extra_gap != 0 or args.concept_every != 0
+               or args.burst_after_trigger != 0 or args.concept_every_sparse != 0
+               or args.trigger_mode != "hsv"
                or args.oracle_keyframe is not None or args.force_trigger or args.bank_score_thresh != 1.0)
     force_trigger = set()
     for part in filter(None, args.force_trigger.split(",")):
@@ -516,6 +540,10 @@ def main():
                 hsv_thresh=args.hsv_thresh, concept_mode=args.concept_mode, swap_map=swap_map,
                 bank_rule=args.bank_rule, bank_extra_gap=args.bank_extra_gap,
                 concept_every=args.concept_every,
+                burst_after_trigger=args.burst_after_trigger, concept_every_sparse=args.concept_every_sparse,
+                trigger_mode=args.trigger_mode, unc_logit_drop=args.unc_logit_drop,
+                unc_area_drop=args.unc_area_drop, unc_empty_n=args.unc_empty_n,
+                unc_window=args.unc_window, unc_cooldown=args.unc_cooldown,
                 oracle_keyframe=args.oracle_keyframe, force_trigger=force_trigger,
                 bank_score_thresh=args.bank_score_thresh,
                 rows=[] if args.exp_log_dir else None,

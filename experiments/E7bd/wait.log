@@ -1,0 +1,986 @@
+Sat Nov 14 14:49:43 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            217W /  300W |    4566MiB /  16303MiB |     97%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     32MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2074MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 14:49:43] [E7bd] GPU free = 11277 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 14:54:43 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 49%   64C    P1            218W /  300W |    4564MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     31MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 14:54:43] [E7bd] GPU free = 11277 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 14:59:43 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 49%   63C    P1            217W /  300W |    4564MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     31MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2074MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 14:59:43] [E7bd] GPU free = 11277 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:04:43 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 49%   63C    P1            218W /  300W |    4563MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2056MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:04:43] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:09:43 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 49%   63C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:09:43] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:14:43 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 49%   64C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:14:43] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:19:43 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:19:43] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:24:43 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            216W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:24:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:29:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   61C    P1            209W /  300W |    4566MiB /  16303MiB |     97%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     34MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:29:44] [E7bd] GPU free = 11274 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:34:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            218W /  300W |    4566MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     34MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:34:44] [E7bd] GPU free = 11274 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:39:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:39:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:44:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   62C    P1            218W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:44:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:49:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 47%   64C    P1            216W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:49:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:54:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:54:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 15:59:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   62C    P1            217W /  300W |    4563MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2074MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 15:59:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:04:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:04:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:09:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   64C    P1            218W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:09:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:14:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   64C    P1            217W /  300W |    4563MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2056MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2074MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:14:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:19:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   64C    P1            218W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:19:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:24:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 47%   61C    P1            210W /  300W |    4563MiB /  16303MiB |     96%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2056MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:24:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:29:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            217W /  300W |    4563MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2056MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:29:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:34:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:34:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:39:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   62C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2056MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:39:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:44:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   62C    P1            214W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:44:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:49:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 47%   63C    P1            216W /  300W |    4563MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:49:44] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:54:44 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:54:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 16:59:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            216W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 16:59:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:04:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:04:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:09:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   62C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:09:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:14:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            218W /  300W |    4565MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:14:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:19:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 47%   62C    P1            211W /  300W |    4561MiB /  16303MiB |     97%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:19:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:24:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   62C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:24:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:29:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   63C    P1            215W /  300W |    4563MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2056MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:29:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:34:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   61C    P1            217W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:34:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:39:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   62C    P1            216W /  300W |    4565MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2054MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:39:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:44:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 48%   62C    P1            211W /  300W |    4561MiB /  16303MiB |     98%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434402      C   ...thanhlt/miniconda3/bin/python       2056MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:44:45] [E7bd] GPU free = 11280 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:49:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 46%   61C    P1            212W /  300W |    3459MiB /  16303MiB |     85%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
+|    0   N/A  N/A         3538482      C   ...thanhlt/miniconda3/bin/python        952MiB |
++-----------------------------------------------------------------------------------------+
+[2026-11-14 17:49:45] [E7bd] GPU free = 12382 MiB < 13312 MiB, waiting 300s...
+Sat Nov 14 17:54:45 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 5070 Ti     Off |   00000000:01:00.0 Off |                  N/A |
+| 46%   64C    P1            215W /  300W |    2502MiB /  16303MiB |     87%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           25034    C+G   ...c/gnome-remote-desktop-daemon        225MiB |
+|    0   N/A  N/A           25075      G   /usr/bin/gnome-shell                     29MiB |
+|    0   N/A  N/A           25438      G   /usr/bin/Xwayland                         4MiB |
+|    0   N/A  N/A           27088      G   .../9057/usr/lib/firefox/firefox         82MiB |
+|    0   N/A  N/A         3434794      C   ...thanhlt/miniconda3/bin/python       2072MiB |
++-----------------------------------------------------------------------------------------+

@@ -1,0 +1,27 @@
+
+first_segment Summary:
+Global score: J&F: 83.9 J: 84.2 F: 83.6
+Time taken: 0.77s
+Saving the results to experiments/E4b/masks/results_first_segment.csv
+
+
+second_segment Summary:
+Global score: J&F: 84.9 J: 84.1 F: 85.7
+Time taken: 0.52s
+Saving the results to experiments/E4b/masks/results_second_segment.csv
+
+
+remain_segments Summary:
+Global score: J&F: 79.4 J: 79.4 F: 79.4
+Time taken: 1.28s
+Saving the results to experiments/E4b/masks/results_remain_segments.csv
+
+We are *SKIPPING* the evaluation of the first and the last frame (standard for semi-supervised video object segmentation).
+In dataset experiments/gt_subset_short10, we are evaluating on 10 videos: ['-klPo9pilc4', '1AtGI9kSzpY', 'BU-wIj--VWs', 'EoQaVBlutWw', 'Gq-DY2iiqbc', 'JAkIt2GhWF0', 'MF7FK-3Kg3A', 'Nm1Sg55z7-Y', 'OFVRaOdgV1Y', 'lKsyz336zNw']
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:02<00:20,  2.28s/it]100%|██████████| 10/10 [00:02<00:00,  4.39it/s]
+
+overall Summary:
+Global score: J&F: 80.6 J: 80.7 F: 80.6
+Time taken: 2.28s
+Saving the results to experiments/E4b/masks/results_overall.csv
+

@@ -1,0 +1,27 @@
+
+first_segment Summary:
+Global score: J&F: 77.8 J: 77.1 F: 78.4
+Time taken: 2.00s
+Saving the results to experiments/E2/masks/results_first_segment.csv
+
+
+second_segment Summary:
+Global score: J&F: 61.5 J: 61.0 F: 62.0
+Time taken: 0.83s
+Saving the results to experiments/E2/masks/results_second_segment.csv
+
+
+remain_segments Summary:
+Global score: J&F: 47.7 J: 46.8 F: 48.7
+Time taken: 2.09s
+Saving the results to experiments/E2/masks/results_remain_segments.csv
+
+We are *SKIPPING* the evaluation of the first and the last frame (standard for semi-supervised video object segmentation).
+In dataset experiments/gt_subset40, we are evaluating on 40 videos: ['-klPo9pilc4', '0Jn5N_pmZuA', '1AtGI9kSzpY', '2yFGHfV4L6U', '4AxWuk52ZUQ', '8a6_6LWj3FY', '9-P4pMS6F2c', 'AeP2Dwree4M', 'BU-wIj--VWs', 'C5ELpD4OZGM', 'CKmkgzeNKZw', 'Crf2aApb0yw', 'EoQaVBlutWw', 'Gq-DY2iiqbc', 'HPTVnL0FN2o', 'JAkIt2GhWF0', 'JJNUDzMqeFU', 'MDDtQoaj6sA', 'MF7FK-3Kg3A', 'N_KKXG5NZdg', 'Nm1Sg55z7-Y', 'OFVRaOdgV1Y', 'R62X_YI1WM4', 'RERWmKSQlIc', 'VbWbRDgphqo', 'W44PFMXuy_Q', 'WZIqYnAlX-4', 'XE6PuQ71Yw0', 'XNhwsl_fQdw', 'YfSpfijoxYw', 'YlbXLJz19ew', '_H00-2zCavQ', '_Z5NkURnkHg', 'dMv3NFJVmBE', 'ehq7OfDUAH8', 'evGz9QWFhnQ', 'kMcn1Af1sD4', 'lKsyz336zNw', 'lfi6LcEFJCM', 'nxC4ON_D0fI']
+  0%|          | 0/40 [00:00<?, ?it/s]  2%|▎         | 1/40 [00:03<02:12,  3.40s/it] 65%|██████▌   | 26/40 [00:03<00:01,  9.73it/s] 80%|████████  | 32/40 [00:03<00:00, 11.66it/s]100%|██████████| 40/40 [00:03<00:00, 10.10it/s]
+
+overall Summary:
+Global score: J&F: 60.1 J: 59.5 F: 60.6
+Time taken: 3.96s
+Saving the results to experiments/E2/masks/results_overall.csv
+

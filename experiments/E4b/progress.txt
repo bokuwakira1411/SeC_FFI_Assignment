@@ -1,0 +1,10 @@
+2026-11-14 01:13:09 1/10 OFVRaOdgV1Y obj=1 frames=119 triggers=118 28.5s
+2026-11-14 01:13:50 2/10 1AtGI9kSzpY obj=1 frames=126 triggers=125 40.9s
+2026-11-14 01:14:15 3/10 BU-wIj--VWs obj=1 frames=128 triggers=127 24.7s
+2026-11-14 01:14:40 4/10 Gq-DY2iiqbc obj=1 frames=130 triggers=129 24.9s
+2026-11-14 01:15:08 5/10 MF7FK-3Kg3A obj=1 frames=131 triggers=130 27.8s
+2026-11-14 01:16:49 6/10 -klPo9pilc4 obj=3 frames=135 triggers=371 101.5s
+2026-11-14 01:17:20 7/10 JAkIt2GhWF0 obj=1 frames=135 triggers=134 30.8s
+2026-11-14 01:17:46 8/10 Nm1Sg55z7-Y obj=1 frames=135 triggers=134 26.2s
+2026-11-14 01:18:15 9/10 lKsyz336zNw obj=1 frames=139 triggers=138 28.9s
+2026-11-14 01:18:47 10/10 EoQaVBlutWw obj=1 frames=147 triggers=146 32.4s

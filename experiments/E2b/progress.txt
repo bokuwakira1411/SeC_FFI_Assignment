@@ -1,0 +1,3 @@
+2026-11-14 01:11:39 1/3 -klPo9pilc4 obj=3 frames=135 triggers=44 28.8s
+2026-11-14 01:12:08 2/3 WZIqYnAlX-4 obj=2 frames=196 triggers=38 29.2s
+2026-11-14 01:12:32 3/3 MDDtQoaj6sA obj=2 frames=166 triggers=19 24.1s

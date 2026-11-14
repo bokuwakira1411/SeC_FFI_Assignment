@@ -1,0 +1,37 @@
+[2026-11-14 00:13:08] queue: start E1
+[2026-11-14 00:23:58] queue: done E1 (GPU 641s)
+[2026-11-14 00:23:58] queue: start E2
+[2026-11-14 00:34:55] queue: done E2 (GPU 646s)
+[2026-11-14 00:34:55] queue: start E3a
+[2026-11-14 00:50:23] queue: done E3a (GPU 919s)
+[2026-11-14 00:50:23] queue: start E3b
+[2026-11-14 01:02:01] queue: done E3b (GPU 688s)
+[2026-11-14 01:02:01] queue: start E4
+[2026-11-14 01:11:06] queue: done E4 (GPU 540s)
+[2026-11-14 01:11:06] queue: start E2b
+[2026-11-14 01:12:37] queue: done E2b (GPU 86s)
+[2026-11-14 01:12:37] queue: start E4b
+[2026-11-14 01:18:53] queue: done E4b (GPU 371s)
+[2026-11-14 01:18:53] queue: start E6
+[2026-11-14 01:31:41] queue: done E6 (GPU 758s)
+[2026-11-14 01:31:41] queue: start E0r
+[2026-11-14 01:44:02] queue: done E0r (GPU 732s)
+[2026-11-14 01:44:02] queue: all done
+[2026-11-14 08:06:13] queue: start E4b40
+[2026-11-14 08:36:40] queue: done E4b40 (GPU 1817s)
+[2026-11-14 08:36:40] queue: start E7
+[2026-11-14 08:52:41] queue: done E7 (GPU 952s)
+[2026-11-14 08:52:41] queue: start E8
+[2026-11-14 09:08:41] queue: done E8 (GPU 951s)
+[2026-11-14 09:08:41] queue2: all done
+[2026-11-14 14:49:43] queue: start E7bd
+[2026-11-14 18:27:23] queue3: all done (E7bd GPU 1948s)
+[2026-11-14 19:59:52] queue4: start E10chk (GPU apps: 25034, 225 MiB, /usr/libexec/gnome-remote-desktop-daemon;3434794, 2072 MiB, /home/thanhlt/miniconda3/bin/python;)
+[2026-11-14 20:01:09] queue4: E10chk: masks identical to E0 on 3 videos
+[2026-11-14 20:01:09] queue4: start E10a (GPU apps: 25034, 225 MiB, /usr/libexec/gnome-remote-desktop-daemon;3434794, 2072 MiB, /home/thanhlt/miniconda3/bin/python;)
+[2026-11-14 20:28:39] queue4: start E10b (GPU apps: 25034, 225 MiB, /usr/libexec/gnome-remote-desktop-daemon;3595110, 952 MiB, /home/thanhlt/miniconda3/bin/python;)
+[2026-11-14 20:44:38] queue4: all done (E10a GPU 1639s, E10b GPU 950s, GPU apps: 25034, 225 MiB, /usr/libexec/gnome-remote-desktop-daemon;)
+[2026-11-14 20:45:17] queue5: start E11chk (GPU apps: 25034, 225 MiB, /usr/libexec/gnome-remote-desktop-daemon;)
+[2026-11-14 20:46:01] queue5: E11chk: masks identical to E0 on 3 videos
+[2026-11-14 20:46:01] queue5: start E11a (GPU apps: 25034, 225 MiB, /usr/libexec/gnome-remote-desktop-daemon;)
+[2026-11-14 20:59:58] queue5: all done (E11a GPU 827s, GPU apps: 25034, 225 MiB, /usr/libexec/gnome-remote-desktop-daemon;)

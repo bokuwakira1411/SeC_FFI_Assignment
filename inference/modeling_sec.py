@@ -547,6 +547,16 @@ class SeCModel(PreTrainedModel):
         #   force_trigger (set of frame_idx): trigger the concept update on these frames whatever hsv_dist,
         #   bank_score_thresh (float, default 1): object score a frame needs to enter the MLLM memory.
         #   concept_every (int, 0 = off): also compute the concept on frames with frame_idx % N == 0.
+        #   burst_after_trigger (int K, 0 = off): also compute the concept on the K tracked frames after each HSV
+        #              trigger (a new trigger during a burst restarts the count),
+        #   concept_every_sparse (int P, 0 = off): outside bursts, also compute the concept when the last
+        #              concept call (or the start frame) is >= P frames back.
+        #   trigger_mode ('hsv' | 'unc' | 'hsv_or_unc'): 'unc' ignores HSV for the concept call (HSV still drives
+        #              bank_rule='hsv'); uncertainty triggers (any enabled signal, decided from frames < f):
+        #   unc_logit_drop (D, None = off): object score logit of f-1 < mean of the w frames before it - D,
+        #   unc_area_drop (r, None = off): mask area of f-1 < (1 - r) * mean of the w frames before it,
+        #   unc_empty_n (N, 0 = off): mask empty on frames f-N..f-1,
+        #   unc_window (w, default 5), unc_cooldown (C): no uncertainty call if the last concept call is <= C back.
         hsv_thresh = 0.35 if exp_ctx is None else exp_ctx.get("hsv_thresh", 0.35)
         concept_mode = "default" if exp_ctx is None else exp_ctx.get("concept_mode", "default")
         exp_rows = None if exp_ctx is None else exp_ctx.get("rows")
@@ -556,6 +566,16 @@ class SeCModel(PreTrainedModel):
         force_trigger = set() if exp_ctx is None else set(exp_ctx.get("force_trigger") or ())
         bank_score_thresh = 1 if exp_ctx is None else exp_ctx.get("bank_score_thresh", 1)
         concept_every = 0 if exp_ctx is None else exp_ctx.get("concept_every", 0)
+        burst_after = 0 if exp_ctx is None else exp_ctx.get("burst_after_trigger", 0)
+        sparse_every = 0 if exp_ctx is None else exp_ctx.get("concept_every_sparse", 0)
+        trigger_mode = "hsv" if exp_ctx is None else exp_ctx.get("trigger_mode", "hsv")
+        unc_D = None if exp_ctx is None else exp_ctx.get("unc_logit_drop")
+        unc_r = None if exp_ctx is None else exp_ctx.get("unc_area_drop")
+        unc_N = 0 if exp_ctx is None else exp_ctx.get("unc_empty_n", 0)
+        unc_w = 5 if exp_ctx is None else exp_ctx.get("unc_window", 5)
+        unc_C = 0 if exp_ctx is None else exp_ctx.get("unc_cooldown", 0)
+        unc_on = trigger_mode != "hsv"
+        _unc_logit, _unc_area = [], []  # per processed frame (incl. cond frame), only filled when unc_on
         if not self.init_prediction_config:
             assert tokenizer
             self.preparing_for_generation(tokenizer=tokenizer)
@@ -597,6 +617,7 @@ class SeCModel(PreTrainedModel):
             processing_order = range(start_frame_idx, end_frame_idx + 1)
 
 
+        _burst_left, _last_call = 0, start_frame_idx  # burst_after_trigger / concept_every_sparse state
         mllm_memory = [(start_frame_idx, Image.open(video_paths[start_frame_idx]).convert('RGB'), init_mask)]
         for k, k_mask in ([] if exp_ctx is None else exp_ctx.get("oracle_keyframes") or []):
             mllm_memory.append((k, Image.open(video_paths[k]).convert('RGB'), k_mask))
@@ -651,6 +672,8 @@ class SeCModel(PreTrainedModel):
                 _hsv_trig = bool(hsv_dist > hsv_thresh)
                 _tracked = True
                 flags = [hsv_dist > hsv_thresh]  # == is_scene_change_hsv(current_img, last_img) by default
+                if trigger_mode == "unc":
+                    flags = [False]
                 if concept_mode == "off":
                     flags = [False]
                 elif concept_mode == "always":
@@ -659,6 +682,30 @@ class SeCModel(PreTrainedModel):
                     flags = [True]
                 elif concept_every > 0 and frame_idx % concept_every == 0:
                     flags = [True]
+                _reason = "hsv" if flags == [True] and _hsv_trig else ("other" if flags == [True] else "")
+                if unc_on and flags != [True] and frame_idx - _last_call > unc_C and _unc_area:
+                    _j = len(_unc_area) - 1
+                    _lo = max(0, _j - unc_w)
+                    _why = ""
+                    if unc_N and _j - unc_N + 1 >= 0 and not any(_unc_area[_j - unc_N + 1:]):
+                        _why = "unc_empty"
+                    elif unc_D is not None and _j > _lo and _unc_logit[_j] < np.mean(_unc_logit[_lo:_j]) - unc_D:
+                        _why = "unc_logit"
+                    elif unc_r is not None and _j > _lo and np.mean(_unc_area[_lo:_j]) > 0 and \
+                            _unc_area[_j] < (1 - unc_r) * np.mean(_unc_area[_lo:_j]):
+                        _why = "unc_area"
+                    if _why:
+                        flags, _reason = [True], _why
+                if _hsv_trig:
+                    _burst_left = burst_after
+                elif _burst_left > 0:
+                    _burst_left -= 1
+                    if flags != [True]:
+                        flags, _reason = [True], "burst"
+                elif sparse_every > 0 and frame_idx - _last_call >= sparse_every and flags != [True]:
+                    flags, _reason = [True], "sparse"
+                if flags == [True]:
+                    _last_call = frame_idx
                 if len(mllm_memory) > mllm_memory_size:
                     _mllm_memory = [mllm_memory[0]] + mllm_memory[-(mllm_memory_size-1):]
                 else:
@@ -693,7 +740,7 @@ class SeCModel(PreTrainedModel):
                             exp_ctx["concept_dir"], f"{exp_ctx['video']}_{exp_ctx['obj']}_{frame_idx:05d}.pt"))
                     n_triggers += 1
                 if exp_rows is not None and _update_flag:
-                    _row.update(triggered=1, n_ctx_frames=len(_mllm_memory),
+                    _row.update(triggered=1, n_ctx_frames=len(_mllm_memory), concept_reason=_reason,
                                 ctx_frames=" ".join(str(f) for f, _, _ in _mllm_memory))
 
 
@@ -720,6 +767,9 @@ class SeCModel(PreTrainedModel):
             _, video_res_masks = self.grounding_encoder._get_orig_video_res_output(
                 inference_state, pred_masks
             )
+            if unc_on:
+                _unc_logit.append(float(current_out["object_score_logits"].float().max()))
+                _unc_area.append(int((video_res_masks[0] > 0.0).sum()))
             # MLLM memory update. Original rule (bank_rule='default', bank_gap=0): a frame where the concept
             # was computed is added if its mask is not empty and its object score > 1.
             _mem_appended = 0

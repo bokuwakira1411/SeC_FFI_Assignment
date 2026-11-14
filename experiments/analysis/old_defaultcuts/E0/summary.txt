@@ -1,0 +1,10 @@
+scene_info boundaries (start of second / remain segment) matched by a detected cut (+-2): 43/67 = 64.2%
+detected cuts: 155 | HSV-trigger frames (per video): 502
+cuts with no HSV trigger within +-2 (missed): 21/155 = 13.5%
+HSV triggers with no cut within +-2 (spurious): 321/502 = 63.9%
+incidents (J drop > 0.3 vs mean of previous 5 frames): 102 in 39 objects
+  at_cut triggered | n | recovered within 10 frames
+       1         1 |  23 | 3/23
+       1         0 |   3 | 2/3
+       0         1 |  50 | 22/50
+       0         0 |  26 | 15/26

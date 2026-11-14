@@ -1,0 +1,13 @@
+cut set: msl5 (experiments/scenecuts_msl5.json)
+scene_info boundaries (start of second / remain segment) matched by a detected cut (+-2): 58/67 = 86.6%
+detected cuts: 321 | HSV-trigger frames (per video): 1178
+cuts with no HSV trigger within +-2 (missed): 36/321 = 11.2%
+HSV triggers with no cut within +-2 (spurious): 678/1178 = 57.6%
+incidents (J drop > 0.3 vs mean of previous 5 frames): 110 in 39 objects
+  at_cut triggered | n | recovered within 10 frames
+       1         1 |  57 | 22/57
+       1         0 |   2 | 2/2
+       0         1 |  42 | 26/42
+       0         0 |   9 | 6/9
+bank decisions on trigger frames: {'added': 493, 'added_periodic': 241, 'obj_score<=1': 56, 'empty_mask': 775}
+objects whose bank stays at 1 frame for the whole video: 2/44; mean J&F 25.9 vs others 75.0 (n=42)
