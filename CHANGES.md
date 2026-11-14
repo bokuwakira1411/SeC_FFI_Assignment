@@ -179,3 +179,9 @@ Defaults unchanged (original behaviour). Check: E11chk (`--trigger_mode hsv`, `s
 - `inference/modeling_sec.py` (`propagate_in_video`, bank update): a frame already in `mllm_memory` is not appended
   again (`bank_reason = already_in_bank`). Only possible with `oracle_keyframes` (I5a put frame 10 in twice: GT mask
   and the trigger's mask); with the original settings each frame is processed once, so behaviour is unchanged.
+
+## 2026-11-14 — (b′) on the snack-can video aP2up9N6H-g
+- `experiments/run_queue_snack2.sh`: I5b_r = I5b re-run with the current code (`--force_trigger 10-30`);
+  I5bp (b′) = `--force_trigger 10-30 --bank_rule hsv` (forced calls do not add frames to the bank). Both
+  `--save_concepts`. No code change. Result: I5b_r masks identical to I5b (J&F 44.7); I5bp 44.5 →
+  (b) − (b′) = 0.2 < 10, so E12 (`--bank_on_burst`) was not run (criterion set beforehand).

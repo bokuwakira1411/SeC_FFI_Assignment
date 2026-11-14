@@ -1,0 +1,27 @@
+
+first_segment Summary:
+Global score: J&F: 85.0 J: 81.3 F: 88.8
+Time taken: 0.31s
+Saving the results to experiments/I5bp/masks/results_first_segment.csv
+
+
+second_segment Summary:
+Global score: J&F: 45.6 J: 44.5 F: 46.7
+Time taken: 0.17s
+Saving the results to experiments/I5bp/masks/results_second_segment.csv
+
+
+remain_segments Summary:
+Global score: J&F: 12.0 J: 11.6 F: 12.3
+Time taken: 0.36s
+Saving the results to experiments/I5bp/masks/results_remain_segments.csv
+
+We are *SKIPPING* the evaluation of the first and the last frame (standard for semi-supervised video object segmentation).
+In dataset experiments/gt_snack, we are evaluating on 1 videos: ['aP2up9N6H-g']
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  1.24it/s]100%|██████████| 1/1 [00:00<00:00,  1.24it/s]
+
+overall Summary:
+Global score: J&F: 44.5 J: 42.7 F: 46.3
+Time taken: 0.81s
+Saving the results to experiments/I5bp/masks/results_overall.csv
+
