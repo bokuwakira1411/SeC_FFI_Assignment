@@ -185,3 +185,82 @@ Defaults unchanged (original behaviour). Check: E11chk (`--trigger_mode hsv`, `s
   I5bp (b′) = `--force_trigger 10-30 --bank_rule hsv` (forced calls do not add frames to the bank). Both
   `--save_concepts`. No code change. Result: I5b_r masks identical to I5b (J&F 44.7); I5bp 44.5 →
   (b) − (b′) = 0.2 < 10, so E12 (`--bank_on_burst`) was not run (criterion set beforehand).
+
+## 2026-11-14 — I1: LLM-free concept distillation — NEGATIVE RESULT (new files only, no model code changed)
+Everything in `experiments/i1_distill/`. Steps 4–5 (student in inference, subset40 runs) not run.
+- `make_split.py` → `split.json`: test = subset40; other 120 videos → 108 train / 12 val (by video, `random.Random(0)`).
+- `collect_teacher.py`: 138 objects × 30 keyframe sets = 4140 teacher vectors (`predict_forward` with GT contours,
+  same input as `modeling_sec.py:727-733`, bf16 autocast; current frame 50 % HSV-trigger frames) → `data/teacher.pt`;
+  Hiera `current_vision_feats[-1]` avg-pooled 16×16 for all frames (`data/feats/`), GT masks 16×16 (`data/masks/`),
+  `data/checks.json` (repeat test bit-identical; cosine between objects 0.85 ≈ within object 0.86 → cosine is a weak
+  measure: the constant mean vector already gets 0.87 on val).
+- Pre-set pass criterion (val): cosine ≥ 0.8 and relative MSE (MSE student / MSE constant mean vector) ≤ 0.5.
+  The criterion was set before the oracle levels below were known.
+- Original student (`student.py`, `train_student.py` → `student_best.pt`, `val_report.json`): relative MSE **0.97**
+  (overfits; best epoch 3). FAIL.
+- Option 1, small object-centric student (`student2.py`, `train_student2.py --mode obj` → `student_obj.pt`,
+  `val_report_obj.json`): relative MSE **0.74**. FAIL.
+- Oracle levels (`experiments/i1_distill/variance_check.json`, `variance_check.py`): knowing the object (leave-one-out
+  object mean) 0.55; object + "visible in current frame" 0.42.
+- Option 3 (hybrid: LLM on HSV triggers, student elsewhere): not run — `collect_hybrid.py` stopped by request
+  after 40/120 videos (partial `data/hybrid.pt`, 40 train videos, not used); no hybrid student trained.
+
+## 2026-11-15 — Keyframe bank: E13a/E13b (oracle), E12 (E10a + E6 bank), E14 (bank by diversity)
+Defaults unchanged (original behaviour). Check: `experiments/bank/chk` (new code, new flags off, `subset_e10chk`)
+→ masks identical to E0 (0 files differ). Outputs in `experiments/bank/`. Pre-change copies:
+`experiments/bank/orig_modeling_sec.py.bak`, `experiments/bank/orig_vos_inference.py.bak`.
+- `inference/modeling_sec.py` (`propagate_in_video`): `exp_ctx` keys `bank_gt_gap` (oracle: like `bank_extra_gap`,
+  same gap rule, but the frame enters the MLLM memory with its GT mask from `gt_mask_fn`; skipped if GT missing /
+  empty; `bank_reason` `added_gt` / `gt_empty`), `bank_diverse_tau` / `bank_diverse_gap` (replaces the bank rule:
+  candidate = tracked trusted frame (mask not empty, object score > 1), HSV trigger or >= gap frames after the last
+  candidate; added if max cosine to the bank < tau; bank capped at 7, when full the non-start frame most similar to
+  the candidate is dropped; `bank_reason` `added_div` / `added_div_replace` / `div_redundant`; log column
+  `div_maxcos`). New function `mask_pooled_descriptor` (Hiera `current_vision_feats[-1]` averaged in the mask,
+  mask area-resized to 64×64, L2-normalised).
+- `vos_evaluation/vos_inference.py`: flags `--bank_gt_gap`, `--bank_diverse_tau`, `--bank_diverse_gap` (5),
+  `--seed` (None = not set); log column `div_maxcos`.
+- `experiments/bank/`: `descriptors.py` (GPU, encoder only: per-frame descriptors for GT and runs),
+  `sim_diverse.py` (CPU: tau for E14 from E10a's logs, target 480 added frames = E6; → `tau.json`, tau = 0.97),
+  `bank_stats.py` (added frames, objects stuck at 1 bank frame, bank diversity), `run_queue_bank.sh`
+  (chk, smoke13/14 on 1 video, descriptors + tau, E13a, E12, E14, E13b; `--seed 0`).
+- `experiments/final_report.py`: rows E13a/E12/E14/E13b (read from `experiments/bank/`), direct controls
+  E13a→E6, E12/E14/E13b→E10a in the reference column, 10-worst-videos and median non-call frame time lines,
+  E6 and bank runs in the incident table; "bank added" counts every `added*` reason.
+- Results (`experiments/bank/report.md`): E13a 74.0 (+2.9 vs E6, CI excl. 0), E12 75.1 (+1.2 vs E10a, CI incl. 0),
+  E14 75.0 (−0.1 vs E12; 520 frames added, actual), E13b 81.1 (+7.2 vs E10a, CI excl. 0). GPU not shared.
+
+## 2026-11-15 — 160-video run: E10a + E12 (experiments frozen after this)
+- `experiments/full160/`: `rest120.txt` (160 videos minus subset40), `gt_rest120/`, `gt_all160/` (symlinks),
+  `run_queue_full160.sh` (chk_E10a: E10a re-run with the current code on 3 subset40 videos → masks identical to
+  `experiments/E10a`; then E10a_rest120, E12_rest120, `--seed 0`), `report160.py` → `summary160.md`
+  (E0 = earlier full run `outputs/secvos_full`; subset40 masks reused from `experiments/E10a`, `experiments/bank/E12`).
+- Result: all160 E0 69.9, E10a 72.6 (+2.7, CI excl. 0), E12 71.9 (+1.9); rest120 E10a 72.2 (+2.3, CI excl. 0),
+  E12 70.8 (+0.9, CI incl. 0); E12 − E10a on rest120 −1.4 (CI excl. 0). No code change.
+
+## 2026-11-15 — E17: concept branch alone when lost (code only; step 0)
+Defaults unchanged (original behaviour). Pre-change copies: `experiments/e17/orig_*.bak`.
+- `inference/sam2_video_predictor.py` (`_track_step`): reads `self._exp_e17` (None = original). With `log_norms`,
+  on concept-call frames stores norm (per-pixel L2 over channels, mean over pixels) of a = memory branch,
+  b = token_attn (concept) branch, (a+b)/2, and mean cos(a, b). With `lost` set, runs the SAM heads a second time
+  on b alone; keeps that output (mask, pred IoU, object score, memory encoding) if mask not empty (high-res logits
+  > 0), pred IoU >= `iou_thresh` and object score > `logit_thresh`, else the original (a+b)/2 output.
+- `inference/modeling_sec.py` (`propagate_in_video`): `exp_ctx` keys `concept_only_lost`, `lost_n` (2),
+  `concept_only_iou` (0.78), `concept_only_logit` (1), `lost_call_every` (0; E17b, reason `lost`),
+  `log_feat_norms`. Lost = mask empty or object score logit <= 0 on the last `lost_n` tracked frames (start frame
+  not counted). A kept concept-only frame is added to the MLLM memory (`bank_reason` `added_concept`) if the bank
+  rule did not add it. Log columns (only when on): `e17_lost`, `e17_accept`, `mix_/con_` iou / logit / px,
+  `gt_empty`, `J_mix`, `J_con` (via `gt_mask_fn`), `con_maxcos` (descriptor as E14 vs the bank given to the
+  MLLM), `e17_log_ms` (logging time, to subtract for fps), `norm_a`, `norm_b`, `norm_mix`, `cos_ab`.
+- `vos_evaluation/vos_inference.py`: flags `--concept_only_lost`, `--lost_n`, `--concept_only_iou`,
+  `--concept_only_logit`, `--lost_call_every`, `--log_feat_norms`; `gt_mask_fn` also set with
+  `--concept_only_lost` (per-object PNGs); E17 log columns written only when present.
+- `experiments/e17/run_queue_e17_step0.sh`: waits for fps160, chk (E10a flags, E17 off, `subset_e10chk`) → masks
+  vs `experiments/E10a`; norms (E10a + `--log_feat_norms --concept_only_lost`, 3 worst E0 videos).
+
+## 2026-11-15 — E17a run on 160 videos (no model code change)
+- Acceptance logit > 0 (`--concept_only_logit 0`; design said > 1, changed before the run, see `experiments/e17/step0.md`).
+- `experiments/e17/run_queue_e17a.sh` (E10a flags + `--concept_only_lost --concept_only_logit 0`, seed 0, all160),
+  `all160.txt`, `detect_cuts_msl5.py` → `scenecuts_msl5_all160.json` (subset40 copied from `scenecuts_msl5.json`,
+  rest120 detected with ContentDetector min_scene_len=5), `report.py` → `report_numbers.txt`, `lost_calls.csv`,
+  `report.md`. References E0 / E10a = `experiments/fps160/`.
+- Result rest120: E17a 77.4 vs E10a 72.2 (+5.1, CI excl. 0); criteria (a) (b) (c) met, (d) misaccept 22.3 % ≥ 20 % → fail.

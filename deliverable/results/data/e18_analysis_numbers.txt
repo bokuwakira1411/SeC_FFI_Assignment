@@ -1,0 +1,51 @@
+
+## A1 – rest120: 265 lần nhận
+
+| loại | số lần | ΔJ TB / lần | ΔJ trung vị / lần | tổng ΔJ | ΔJ tại frame nhận (TB) | độ dài cửa sổ TB | độ dài thiệt hại: trung vị; TB (bị cắt ở cuối video) |
+|---|---|---|---|---|---|---|---|
+| correct | 206 | +7.36 | +0.03 | +1515.2 | +0.314 | 47.4 | 0; 1.6 (1) |
+| invented | 45 | -6.43 | -3.00 | -289.6 | -0.622 | 50.5 | 3; 7.9 (1) |
+| wrong | 14 | -0.64 | +0.00 | -8.9 | -0.041 | 53.8 | 0; 0.1 (0) |
+| all | 265 | +4.59 | +0.01 | +1216.7 | +0.136 | 48.3 | 0; 2.6 (2) |
+
+## A1 – all160: 339 lần nhận
+
+| loại | số lần | ΔJ TB / lần | ΔJ trung vị / lần | tổng ΔJ | ΔJ tại frame nhận (TB) | độ dài cửa sổ TB | độ dài thiệt hại: trung vị; TB (bị cắt ở cuối video) |
+|---|---|---|---|---|---|---|---|
+| correct | 260 | +8.46 | +0.03 | +2198.6 | +0.333 | 51.0 | 0; 1.5 (1) |
+| invented | 55 | -6.05 | -3.00 | -332.8 | -0.600 | 49.0 | 3; 7.5 (1) |
+| wrong | 24 | +1.04 | +0.00 | +24.9 | -0.048 | 50.2 | 0; 0.8 (0) |
+| all | 339 | +5.58 | +0.01 | +1890.7 | +0.155 | 50.6 | 0; 2.4 (2) |
+
+## A1 – subset40: 74 lần nhận
+
+| loại | số lần | ΔJ TB / lần | ΔJ trung vị / lần | tổng ΔJ | ΔJ tại frame nhận (TB) | độ dài cửa sổ TB | độ dài thiệt hại: trung vị; TB (bị cắt ở cuối video) |
+|---|---|---|---|---|---|---|---|
+| correct | 54 | +12.66 | +0.71 | +683.5 | +0.407 | 64.8 | 0; 0.9 (0) |
+| invented | 10 | -4.32 | -1.16 | -43.2 | -0.500 | 42.1 | 0; 6.0 (0) |
+| wrong | 10 | +3.38 | +0.01 | +33.8 | -0.056 | 45.1 | 0; 1.7 (0) |
+| all | 74 | +9.11 | +0.02 | +674.1 | +0.222 | 59.1 | 0; 1.7 (0) |
+
+rest120: 28 object giảm (J&F E17a < E10a); 20 có >= 1 lần nhận nhầm. Tổng phần J giảm (chỉ cộng frame có ΔJ < 0) -362.6 frame-J; trong cửa sổ sau nhận nhầm -354.2 = 97.7%.
+  object giảm mà không có lần nhận nào: 0
+
+## A2 – AUC (đúng > nhầm; 0.5 = ngẫu nhiên, < 0.5 = ngược chiều)
+
+| tín hiệu | subset40: đúng vs nhầm | subset40: đúng vs bịa | rest120: đúng vs nhầm | rest120: đúng vs bịa |
+|---|---|---|---|---|
+| cos max tới bank (`con_maxcos`) | 0.614 | 0.644 | 0.573 | 0.548 |
+| pred_iou (`con_iou`) | 0.767 | 0.826 | 0.700 | 0.673 |
+| object_score_logit (`con_logit`) | 0.769 | 0.902 | 0.646 | 0.666 |
+| diện tích mask / frame (`area`) | 0.540 | 0.504 | 0.498 | 0.454 |
+subset40: correct 54, invented 10, wrong 10
+rest120: correct 206, invented 45, wrong 14
+
+Tín hiệu có AUC subset40 >= 0.70 (đúng vs nhầm): ['con_iou', 'con_logit']
+- con_iou >= 0.8395 (chọn trên subset40): subset40 giữ 48/54 đúng, chặn 6/20 nhầm
+  rest120: giữ 193/206 đúng; chặn 8/59 nhầm (bịa 7/45, bắt nhầm 1/14); tỷ lệ nhận nhầm còn lại 20.9%
+- con_logit >= 0.7168 (chọn trên subset40): subset40 giữ 48/54 đúng, chặn 9/20 nhầm
+  rest120: giữ 179/206 đúng; chặn 18/59 nhầm (bịa 14/45, bắt nhầm 4/14); tỷ lệ nhận nhầm còn lại 18.6%
+
+## A3 – pixel memory của E10a ở frame mất dấu (all160)
+
+frame mất dấu: 13389; số frame memory TB (không tính frame đầu): 18.1; frame memory xấu TB: 1.00; frame có >= 1 memory xấu: 100.0%; khoảng cách tới frame xấu trong memory: {1: 13389}

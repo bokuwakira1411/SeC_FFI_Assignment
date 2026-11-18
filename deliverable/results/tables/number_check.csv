@@ -1,0 +1,22 @@
+set,run,expected,recomputed,diff,flag_gt_0.1
+rest120,E0,70.0,69.97,-0.03,False
+rest120,E10a,72.2,72.24,0.04,False
+rest120,E12,70.8,70.83,0.03,False
+rest120,E17a,77.4,77.37,-0.03,False
+rest120,E18_output,72.7,72.71,0.01,False
+rest120,E18_pixel,77.1,77.06,-0.04,False
+all160,E0,69.9,69.93,0.03,False
+all160,E10a,72.6,72.64,0.04,False
+all160,E12,71.9,71.85,-0.05,False
+all160,E17a,78.6,78.58,-0.02,False
+subset40 (design runs),E0,69.8,69.78,-0.02,False
+subset40 (design runs),E10a,73.9,73.88,-0.02,False
+subset40 (design runs),E13b,81.1,81.07,-0.03,False
+subset40 (160-video runs),E0,69.8,69.78,-0.02,False
+subset40 (160-video runs),E10a,73.9,73.88,-0.02,False
+10 worst E0 videos (all160),E0,19.1,19.09,-0.01,False
+10 worst E0 videos (all160),E10a,28.7,28.68,-0.02,False
+10 worst E0 videos (all160),E17a,48.8,48.82,0.02,False
+rest120 (E0 cross-check),E0_secvos_full,69.97,69.97,0.0,False
+all160 (E0 cross-check),E0_secvos_full,69.93,69.93,0.0,False
+subset40 (E0 cross-check),E0_secvos_full,69.78,69.78,0.0,False

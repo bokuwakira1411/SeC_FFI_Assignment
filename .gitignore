@@ -31,3 +31,5 @@ SeC/dataset/SA-V
 
 /experiments/*/masks/
 /experiments/*/concepts/
+/deriverable/*
+/experiments/*

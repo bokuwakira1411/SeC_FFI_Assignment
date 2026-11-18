@@ -228,7 +228,19 @@ def vos_separate_inference_per_object(
                 unc_area_drop=exp_cfg["unc_area_drop"], unc_empty_n=exp_cfg["unc_empty_n"],
                 unc_window=exp_cfg["unc_window"], unc_cooldown=exp_cfg["unc_cooldown"],
                 force_trigger=exp_cfg["force_trigger"], bank_score_thresh=exp_cfg["bank_score_thresh"],
+                bank_gt_gap=exp_cfg["bank_gt_gap"], bank_diverse_tau=exp_cfg["bank_diverse_tau"],
+                bank_diverse_gap=exp_cfg["bank_diverse_gap"],
+                concept_only_lost=exp_cfg["concept_only_lost"], lost_n=exp_cfg["lost_n"],
+                concept_only_iou=exp_cfg["concept_only_iou"], concept_only_logit=exp_cfg["concept_only_logit"],
+                lost_call_every=exp_cfg["lost_call_every"], log_feat_norms=exp_cfg["log_feat_norms"],
+                fusion_w=exp_cfg["fusion_w"], fusion_sweep=exp_cfg["fusion_sweep"], e17_commit=exp_cfg["e17_commit"],
+                bank_confirm_k=exp_cfg["bank_confirm_k"],
             )
+            if exp_cfg["bank_gt_gap"] or (exp_cfg["concept_only_lost"] and per_obj_png_file):
+                def gt_mask_fn(f, _obj_dir=os.path.join(input_mask_dir, video_name, obj_name)):
+                    p = os.path.join(_obj_dir, f"{frame_names[f]}.png")
+                    return load_ann_png(p)[0] > 0 if os.path.exists(p) else None
+                exp_ctx["gt_mask_fn"] = gt_mask_fn
             if exp_cfg["oracle_keyframe"] is not None:
                 k = exp_cfg["oracle_keyframe"]
                 k_masks, _ = load_masks_from_dir(
@@ -311,7 +323,13 @@ def write_exp_logs(exp_log_dir, video_name, rows, video_sec, n_done, n_total):
     fields = ["video", "obj", "frame", "is_cond", "hsv_dist", "hsv_trigger", "triggered",
               "mllm_memory_len", "n_ctx_frames", "mem_appended", "bank_reason", "mask_px", "pred_iou",
               "object_score_logit", "predict_forward_ms", "frame_ms",
-              "ctx_frames", "bank_frames", "sam_mem_frames", "concept_reason"]
+              "ctx_frames", "bank_frames", "sam_mem_frames", "concept_reason", "div_maxcos"]
+    # E17 columns (only written when present: original logs unchanged)
+    fields += [k for k in ["e17_lost", "e17_accept", "mix_iou", "mix_logit", "mix_px", "con_iou", "con_logit",
+                           "con_px", "gt_empty", "J_mix", "J_con", "con_maxcos", "e17_log_ms",
+                           "norm_a", "norm_b", "norm_mix", "cos_ab", "bank_confirm"] if any(k in r for r in rows)]
+    # E17c sweep / norm columns (sw<100 w>_*, norm_f<100 w>)
+    fields += sorted({k for r in rows for k in r if k.startswith(("sw", "J_sw", "norm_f"))})
     with open(os.path.join(exp_log_dir, "frames", f"{video_name}.csv"), "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
@@ -330,7 +348,7 @@ def write_exp_logs(exp_log_dir, video_name, rows, video_sec, n_done, n_total):
                 f"obj={n_obj} frames={n_frames} triggers={n_trig} {video_sec:.1f}s\n")
 
 
-def main():
+def build_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--model_path",
@@ -462,16 +480,89 @@ def main():
                         help="frames where the concept update is forced, e.g. '10-30,45'")
     parser.add_argument("--bank_score_thresh", type=float, default=1.0,
                         help="object score a trigger frame needs to enter the MLLM memory (original: 1)")
+    parser.add_argument("--bank_gt_gap", type=int, default=0,
+                        help="oracle: also add a frame to the MLLM memory with its GT mask every >= N frames (0 = off)")
+    parser.add_argument("--bank_diverse_tau", type=float, default=None,
+                        help="bank by diversity: add a candidate if max cosine to the bank < tau (None = off)")
+    parser.add_argument("--bank_diverse_gap", type=int, default=5,
+                        help="bank by diversity: candidate every >= N frames (plus HSV-trigger frames)")
+    parser.add_argument("--concept_only_lost", action="store_true",
+                        help="E17: on concept-call frames while lost, keep the concept-branch-only mask if it passes "
+                             "the pred IoU / object score test, and add the frame to the MLLM memory")
+    parser.add_argument("--lost_n", type=int, default=2,
+                        help="lost = mask empty or object score logit <= 0 on the last N tracked frames")
+    parser.add_argument("--concept_only_iou", type=float, default=0.78, help="E17: pred IoU needed (>=)")
+    parser.add_argument("--concept_only_logit", type=float, default=1.0, help="E17: object score needed (>)")
+    parser.add_argument("--lost_call_every", type=int, default=0,
+                        help="E17b: while lost, also call the concept every >= K frames; 0 = off")
+    parser.add_argument("--fusion_w", type=float, default=1.0,
+                        help="E17c: with --concept_only_lost, decoder on (1 - w) memory + w concept instead of "
+                             "the concept branch alone (1.0 = E17a, 0.5 = original output)")
+    parser.add_argument("--e17_commit", choices=["full", "pixel", "output"], default="full",
+                        help="E18: where a kept concept mask goes: full = output + pixel memory + MLLM memory (E17a); "
+                             "pixel = output + pixel memory; output = scored output only (tracking state as E10a)")
+    parser.add_argument("--bank_confirm_k", type=int, default=0,
+                        help="E18b (with --e17_commit pixel): add a kept concept frame to the MLLM memory only after the "
+                             "next k frames pass the mask / pred IoU / object score test; 0 = off")
+    parser.add_argument("--fusion_sweep", type=str, default="",
+                        help="E17c offline sweep, e.g. '0.5,0.6,0.7,0.8,0.9,1.0': with --concept_only_lost, log the "
+                             "decoder output for every w on concept calls while lost; output unchanged")
+    parser.add_argument("--log_feat_norms", action="store_true",
+                        help="log norms of the memory / concept / averaged features on concept-call frames")
+    parser.add_argument("--seed", type=int, default=None, help="torch / numpy / random seed (None = not set)")
     parser.add_argument("--skip_done", action="store_true",
                         help="skip videos whose output masks are already complete (resume)")
-    args = parser.parse_args()
+    return parser
+
+
+def make_exp_cfg(args, swap_map, force_trigger):
+    """Experiment settings for one video (fresh per-frame row list)."""
+    return dict(
+        hsv_thresh=args.hsv_thresh, concept_mode=args.concept_mode, swap_map=swap_map,
+        bank_rule=args.bank_rule, bank_extra_gap=args.bank_extra_gap,
+        concept_every=args.concept_every,
+        burst_after_trigger=args.burst_after_trigger, concept_every_sparse=args.concept_every_sparse,
+        trigger_mode=args.trigger_mode, unc_logit_drop=args.unc_logit_drop,
+        unc_area_drop=args.unc_area_drop, unc_empty_n=args.unc_empty_n,
+        unc_window=args.unc_window, unc_cooldown=args.unc_cooldown,
+        oracle_keyframe=args.oracle_keyframe, force_trigger=force_trigger,
+        bank_score_thresh=args.bank_score_thresh,
+        bank_gt_gap=args.bank_gt_gap, bank_diverse_tau=args.bank_diverse_tau,
+        bank_diverse_gap=args.bank_diverse_gap,
+        concept_only_lost=args.concept_only_lost, lost_n=args.lost_n, concept_only_iou=args.concept_only_iou,
+        concept_only_logit=args.concept_only_logit, lost_call_every=args.lost_call_every,
+        log_feat_norms=args.log_feat_norms, fusion_w=args.fusion_w,
+        fusion_sweep=[float(x) for x in args.fusion_sweep.split(",") if x] or None, e17_commit=args.e17_commit,
+        bank_confirm_k=args.bank_confirm_k,
+        rows=[] if args.exp_log_dir else None,
+        concept_dir=os.path.join(args.exp_log_dir, "concepts")
+        if (args.exp_log_dir and args.save_concepts) else None,
+    )
+
+
+def main():
+    args = build_parser().parse_args()
+    assert not (args.bank_gt_gap and args.bank_extra_gap), "--bank_gt_gap and --bank_extra_gap are exclusive"
+    assert not (args.bank_gt_gap and args.bank_diverse_tau is not None), "--bank_gt_gap needs the default bank"
+    assert args.bank_gt_gap == 0 or args.per_obj_png_file, "--bank_gt_gap needs --per_obj_png_file"
+    assert args.lost_call_every == 0 or args.concept_only_lost, "--lost_call_every needs --concept_only_lost"
+    assert (args.fusion_w == 1.0 and not args.fusion_sweep) or args.concept_only_lost, \
+        "--fusion_w / --fusion_sweep need --concept_only_lost"
+    assert args.e17_commit == "full" or args.concept_only_lost, "--e17_commit needs --concept_only_lost"
+    assert args.bank_confirm_k == 0 or args.e17_commit == "pixel", "--bank_confirm_k needs --e17_commit pixel"
+    assert 0.0 <= args.fusion_w <= 1.0, "--fusion_w must be in [0, 1] (convex combination)"
+    if args.seed is not None:
+        import random
+        random.seed(args.seed); np.random.seed(args.seed); torch.manual_seed(args.seed)
     if args.concept_mode == "swap":
         assert args.swap_map, "--concept_mode swap needs --swap_map"
     use_exp = (args.exp_log_dir is not None or args.concept_mode != "default" or args.hsv_thresh != 0.35
                or args.bank_rule != "default" or args.bank_extra_gap != 0 or args.concept_every != 0
                or args.burst_after_trigger != 0 or args.concept_every_sparse != 0
                or args.trigger_mode != "hsv"
-               or args.oracle_keyframe is not None or args.force_trigger or args.bank_score_thresh != 1.0)
+               or args.oracle_keyframe is not None or args.force_trigger or args.bank_score_thresh != 1.0
+               or args.bank_gt_gap != 0 or args.bank_diverse_tau is not None
+               or args.concept_only_lost or args.lost_call_every != 0 or args.log_feat_norms)
     force_trigger = set()
     for part in filter(None, args.force_trigger.split(",")):
         a, _, b = part.partition("-")
@@ -536,20 +627,7 @@ def main():
             continue
         exp_cfg = None
         if use_exp:
-            exp_cfg = dict(
-                hsv_thresh=args.hsv_thresh, concept_mode=args.concept_mode, swap_map=swap_map,
-                bank_rule=args.bank_rule, bank_extra_gap=args.bank_extra_gap,
-                concept_every=args.concept_every,
-                burst_after_trigger=args.burst_after_trigger, concept_every_sparse=args.concept_every_sparse,
-                trigger_mode=args.trigger_mode, unc_logit_drop=args.unc_logit_drop,
-                unc_area_drop=args.unc_area_drop, unc_empty_n=args.unc_empty_n,
-                unc_window=args.unc_window, unc_cooldown=args.unc_cooldown,
-                oracle_keyframe=args.oracle_keyframe, force_trigger=force_trigger,
-                bank_score_thresh=args.bank_score_thresh,
-                rows=[] if args.exp_log_dir else None,
-                concept_dir=os.path.join(args.exp_log_dir, "concepts")
-                if (args.exp_log_dir and args.save_concepts) else None,
-            )
+            exp_cfg = make_exp_cfg(args, swap_map, force_trigger)
         torch.cuda.synchronize()
         t_video = time.perf_counter()
         if not args.track_object_appearing_later_in_video:

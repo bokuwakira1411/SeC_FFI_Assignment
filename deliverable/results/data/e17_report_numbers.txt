@@ -1,0 +1,99 @@
+
+## all160 (160 videos, 182 objects)
+
+| Run | J&F | first / second / remain | Δ vs E0 [obj CI; video CI] | up/down vs E0 | Δ vs E10a [obj CI; video CI] | up/down vs E10a | % concept | fps (median; mean) | accepted | bank added |
+|---|---|---|---|---|---|---|---|---|---|---|
+| E0 | 69.9 | 84.0 / 69.8 / 67.5 | – | – | – | – | 7.4 | 10.50; 9.92 | 0 | 850 |
+| E10a | 72.6 | 85.7 / 72.9 / 70.2 | +2.7 [+1.6, +4.0] *; [+1.5, +4.0] * | 95/54 | – | – | 25.7 | 8.19; 7.75 | 0 | 878 |
+| E17a | 78.6 | 87.9 / 78.8 / 77.3 | +8.7 [+6.1, +11.3] *; [+6.0, +11.4] * | 115/49 | +5.9 [+3.8, +8.3] *; [+3.7, +8.3] * | 83/36 | 25.7 | 7.09; 6.84 | 339 | 1150 (152 added_concept) |
+
+10 worst E0 videos in all160: E0 19.1, E10a 28.7, E17a 48.8
+
+lost calls: 3051 (GT empty 2054); GT not empty 997: mean J mix 0.210 con 0.311; non-empty mix 24.6% con 40.2%; con > mix (+0.01) 162, con < mix 69
+accepted 339; with GT not empty: mean J mix 0.622 con 0.874
+| accepted logit | n | GT empty (invented) | J_con < 0.5 (wrong object) | misaccept % | J_con median |
+|---|---|---|---|---|---|
+| (0, 1] | 92 | 29 | 10 | 42.4 | 0.891 |
+| > 1 | 247 | 26 | 14 | 16.2 | 0.966 |
+| all | 339 | 55 | 24 | 23.3 | 0.960 |
+misaccept examples:
+      video obj  frame  gt_empty  J_mix  J_con  con_iou  con_logit  con_maxcos
+dIuH0AhcX5Q 001     88       1.0    0.0    0.0  0.94141    1.15625     0.78516
+E_UbFKdWFl4 000     45       1.0    1.0    0.0  0.89453    0.21094     0.75781
+E_UbFKdWFl4 000    131       1.0    1.0    0.0  0.97656    0.50000     0.91406
+_H00-2zCavQ 000     25       0.0    0.0    0.0  0.83594    0.32227     0.71875
+_H00-2zCavQ 000     61       0.0    0.0    0.0  0.96484    0.43164     0.82422
+_H00-2zCavQ 000    116       0.0    0.0    0.0  0.98828    4.12500     0.91406
+wXXlIuD8Fo8 000     47       1.0    1.0    0.0  0.79297    0.40430     0.33789
+wXXlIuD8Fo8 000    221       1.0    0.0    0.0  0.91016    7.00000     0.89062
+
+| Run | incidents (objects) | at cut + concept | at cut, no concept | no cut + concept | no cut, no concept | recovered (all) |
+|---|---|---|---|---|---|---|
+| E10a | 562 (164) | 259 (rec. 100/257) | 20 (rec. 12/20) | 202 (rec. 144/202) | 81 (rec. 60/81) | 316/560 = 56.4% |
+| E17a | 560 (163) | 254 (rec. 135/253) | 19 (rec. 11/19) | 202 (rec. 153/202) | 85 (rec. 66/85) | 365/559 = 65.3% |
+
+## rest120 (120 videos, 138 objects)
+
+| Run | J&F | first / second / remain | Δ vs E0 [obj CI; video CI] | up/down vs E0 | Δ vs E10a [obj CI; video CI] | up/down vs E10a | % concept | fps (median; mean) | accepted | bank added |
+|---|---|---|---|---|---|---|---|---|---|---|
+| E0 | 70.0 | 85.1 / 68.7 / 68.4 | – | – | – | – | 7.5 | 10.48; 9.78 | 0 | 651 |
+| E10a | 72.2 | 86.8 / 71.4 / 70.4 | +2.3 [+1.0, +3.7] *; [+1.0, +3.7] * | 72/40 | – | – | 26.0 | 7.99; 7.63 | 0 | 674 |
+| E17a | 77.4 | 88.3 / 76.0 / 76.5 | +7.4 [+4.7, +10.3] *; [+4.7, +10.4] * | 87/36 | +5.1 [+2.8, +7.6] *; [+2.8, +7.6] * | 61/28 | 26.0 | 6.71; 6.57 | 265 | 866 (113 added_concept) |
+
+10 worst E0 videos in rest120: E0 22.9, E10a 31.1, E17a 47.2
+
+lost calls: 2366 (GT empty 1555); GT not empty 811: mean J mix 0.207 con 0.300; non-empty mix 24.3% con 37.6%; con > mix (+0.01) 123, con < mix 57
+accepted 265; with GT not empty: mean J mix 0.638 con 0.895
+| accepted logit | n | GT empty (invented) | J_con < 0.5 (wrong object) | misaccept % | J_con median |
+|---|---|---|---|---|---|
+| (0, 1] | 71 | 20 | 6 | 36.6 | 0.918 |
+| > 1 | 194 | 25 | 8 | 17.0 | 0.969 |
+| all | 265 | 45 | 14 | 22.3 | 0.964 |
+misaccept examples:
+      video obj  frame  gt_empty  J_mix  J_con  con_iou  con_logit  con_maxcos
+dIuH0AhcX5Q 001     88       1.0    0.0    0.0  0.94141    1.15625     0.78516
+E_UbFKdWFl4 000     45       1.0    1.0    0.0  0.89453    0.21094     0.75781
+E_UbFKdWFl4 000    131       1.0    1.0    0.0  0.97656    0.50000     0.91406
+wXXlIuD8Fo8 000     47       1.0    1.0    0.0  0.79297    0.40430     0.33789
+wXXlIuD8Fo8 000    221       1.0    0.0    0.0  0.91016    7.00000     0.89062
+cwb2y51L4oE 000     39       1.0    1.0    0.0  0.93750    0.71484     0.76953
+BPNi5dTHwKM 000     71       1.0    1.0    0.0  0.89844    0.42969     0.57812
+mGkTa8gcANY 000    107       1.0    0.0    0.0  0.78516    4.59375     0.94922
+
+| Run | incidents (objects) | at cut + concept | at cut, no concept | no cut + concept | no cut, no concept | recovered (all) |
+|---|---|---|---|---|---|---|
+| E10a | 442 (125) | 203 (rec. 80/201) | 14 (rec. 8/14) | 158 (rec. 113/158) | 67 (rec. 50/67) | 251/440 = 57.0% |
+| E17a | 447 (124) | 203 (rec. 106/202) | 13 (rec. 7/13) | 159 (rec. 117/159) | 72 (rec. 57/72) | 287/446 = 64.3% |
+
+## subset40 (40 videos, 44 objects)
+
+| Run | J&F | first / second / remain | Δ vs E0 [obj CI; video CI] | up/down vs E0 | Δ vs E10a [obj CI; video CI] | up/down vs E10a | % concept | fps (median; mean) | accepted | bank added |
+|---|---|---|---|---|---|---|---|---|---|---|
+| E0 | 69.8 | 80.8 / 73.1 / 64.5 | – | – | – | – | 7.2 | 10.75; 10.32 | 0 | 199 |
+| E10a | 73.9 | 82.3 / 77.8 / 69.3 | +4.1 [+1.6, +6.8] *; [+1.5, +7.1] * | 23/14 | – | – | 24.6 | 8.33; 8.12 | 0 | 204 |
+| E17a | 82.4 | 86.7 / 87.6 / 79.8 | +12.6 [+6.8, +18.9] *; [+6.7, +19.6] * | 28/13 | +8.5 [+3.4, +14.1] *; [+3.4, +14.5] * | 22/8 | 24.6 | 7.85; 7.65 | 74 | 284 (39 added_concept) |
+
+10 worst E0 videos in subset40: E0 36.3, E10a 41.4, E17a 77.3
+
+lost calls: 685 (GT empty 499); GT not empty 186: mean J mix 0.222 con 0.358; non-empty mix 25.8% con 51.6%; con > mix (+0.01) 39, con < mix 12
+accepted 74; with GT not empty: mean J mix 0.565 con 0.802
+| accepted logit | n | GT empty (invented) | J_con < 0.5 (wrong object) | misaccept % | J_con median |
+|---|---|---|---|---|---|
+| (0, 1] | 21 | 9 | 4 | 61.9 | 0.000 |
+| > 1 | 53 | 1 | 6 | 13.2 | 0.954 |
+| all | 74 | 10 | 10 | 27.0 | 0.904 |
+misaccept examples:
+      video obj  frame  gt_empty   J_mix   J_con  con_iou  con_logit  con_maxcos
+_H00-2zCavQ 000     25       0.0 0.00000 0.00000  0.83594    0.32227     0.71875
+_H00-2zCavQ 000     61       0.0 0.00000 0.00000  0.96484    0.43164     0.82422
+_H00-2zCavQ 000    116       0.0 0.00000 0.00000  0.98828    4.12500     0.91406
+VbWbRDgphqo 000    146       0.0 0.00000 0.00000  0.82422    0.17871     0.77344
+8a6_6LWj3FY 000    168       0.0 0.00000 0.00000  0.86328    0.94531     0.86328
+-klPo9pilc4 002     95       1.0 1.00000 0.00000  0.78125    0.92969     0.51953
+Crf2aApb0yw 000    206       0.0 0.14919 0.15342  0.91406    1.28906     0.66016
+JJNUDzMqeFU 000    136       1.0 1.00000 0.00000  0.87500    0.48438     0.86719
+
+| Run | incidents (objects) | at cut + concept | at cut, no concept | no cut + concept | no cut, no concept | recovered (all) |
+|---|---|---|---|---|---|---|
+| E10a | 120 (39) | 56 (rec. 20/56) | 6 (rec. 4/6) | 44 (rec. 31/44) | 14 (rec. 10/14) | 65/120 = 54.2% |
+| E17a | 113 (39) | 51 (rec. 29/51) | 6 (rec. 4/6) | 43 (rec. 36/43) | 13 (rec. 9/13) | 78/113 = 69.0% |

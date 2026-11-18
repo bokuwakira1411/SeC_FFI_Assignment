@@ -1,0 +1,16 @@
+{
+ "val": {
+  "obj_mean_loo": 0.5520327687263489,
+  "obj_x_curvisible_loo": 0.4193249046802521,
+  "curvisible_only": 0.8053027987480164,
+  "nkeys_only": 0.9581496715545654,
+  "frac_cur_visible": 0.7055555555555556
+ },
+ "train": {
+  "obj_mean_loo": 0.5723068118095398,
+  "obj_x_curvisible_loo": 0.3914864659309387,
+  "curvisible_only": 0.8389749526977539,
+  "nkeys_only": 0.9981235861778259,
+  "frac_cur_visible": 0.6375661375661376
+ }
+}

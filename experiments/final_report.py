@@ -43,8 +43,22 @@ EXPS = [  # name, subset, description
     ("E10a", "subset40", "concept on 3 frames after each HSV trigger + every >=15 frames, bank on HSV triggers"),
     ("E10b", "subset40", "concept on 3 frames after each HSV trigger, bank on HSV triggers"),
     ("E11a", "subset40", "HSV OR uncertainty (D=2, r=0.5, N=1, C=5), bank on HSV triggers"),
+    ("E13a", "subset40", "oracle bank: E0 + frame with its GT mask every >=10 frames"),
+    ("E12", "subset40", "E10a + bank also every >=10 frames (as E6)"),
+    ("E14", "subset40", "E10a + bank by diversity (Hiera mask descriptor, cosine < tau, no FIFO)"),
+    ("E13b", "subset40", "oracle bank: E10a + frame with its GT mask every >=10 frames"),
 ]
-REF = {"E10a": "E7", "E10b": "E8", "E11a": "E3a"}   # extra paired comparison (same-cost reference)
+BANK = {"E13a", "E12", "E14", "E13b"}   # outputs in experiments/bank/<name>
+# extra paired comparison (same-cost reference / direct control)
+REF = {"E10a": "E7", "E10b": "E8", "E11a": "E3a", "E13a": "E6", "E12": "E10a", "E14": "E10a", "E13b": "E10a"}
+
+
+def edir(n):
+    return f"experiments/bank/{n}" if n in BANK else f"experiments/{n}"
+
+
+def adir(n):  # analyze_frames.py output (called with bank/<name> for bank runs)
+    return f"experiments/analysis/bank/{n}" if n in BANK else f"experiments/analysis/{n}"
 N_BOOT = 10000
 
 
@@ -103,33 +117,36 @@ def per_object(masks_dir):
 
 
 def frame_stats(exp):
-    rows = [r for f in glob.glob(f"experiments/{exp}/frames/*.csv") for r in csv.DictReader(open(f))]
+    rows = [r for f in glob.glob(f"{edir(exp)}/frames/*.csv") for r in csv.DictReader(open(f))]
     nc = [r for r in rows if r["is_cond"] == "0"]
     trig = [r for r in nc if r["triggered"] == "1"]
     pf = np.array([float(r["predict_forward_ms"]) for r in trig if r["predict_forward_ms"]])
-    vids = list(csv.DictReader(open(f"experiments/{exp}/videos.csv")))
+    vids = list(csv.DictReader(open(f"{edir(exp)}/videos.csv")))
     sec = sum(float(v["video_sec"]) for v in vids)
-    added = sum(r.get("bank_reason", "") in ("added", "added_periodic") for r in nc) \
+    added = sum(r.get("bank_reason", "").startswith("added") for r in nc) \
         if "bank_reason" in (nc[0] if nc else {}) else None
-    added_p = sum(r.get("bank_reason", "") == "added_periodic" for r in nc) if added is not None else None
+    added_p = sum(r.get("bank_reason", "") in ("added_periodic", "added_gt") for r in nc) \
+        if added is not None else None
+    t_nocall = [float(r["frame_ms"]) for r in nc if r["triggered"] == "0" and r.get("frame_ms")]
     return dict(
         trig_rate=100 * len(trig) / len(nc), n_trig=len(trig),
         fps=sum(int(v["n_frames"]) for v in vids) / sec, video_sec=sec,
         pf_mean=pf.mean() if len(pf) else float("nan"),
         pf_p95=np.percentile(pf, 95) if len(pf) else float("nan"),
         added=added, added_periodic=added_p,
-        gpu_h=int(open(f"experiments/{exp}/gpu_time.txt").read()) / 3600,
+        gpu_h=int(open(f"{edir(exp)}/gpu_time.txt").read()) / 3600,
+        nocall_ms=float(np.median(t_nocall)) if t_nocall else float("nan"),
     )
 
 
 def main():
     os.makedirs(OUT, exist_ok=True)
-    done = [e for e in EXPS if os.path.exists(f"experiments/{e[0]}/eval.txt")]
+    done = [e for e in EXPS if os.path.exists(f"{edir(e[0])}/eval.txt")]
     md = []
     res, obj_jf, stats = {}, {}, {}
     for name, subset, _ in done:
-        res[name] = parse_eval(f"experiments/{name}/eval.txt")
-        obj_jf[name] = per_object(f"experiments/{name}/masks")
+        res[name] = parse_eval(f"{edir(name)}/eval.txt")
+        obj_jf[name] = per_object(f"{edir(name)}/masks")
         stats[name] = frame_stats(name)
     # E0 on the smaller subsets, for E4/E4b/E2b
     for subset in ("short10", "multiobj"):
@@ -165,9 +182,9 @@ def main():
 
     md.append("## J&F / J / F\n")
     md.append("| Exp | J&F | ΔJ&F vs E0 [95% CI] | objects up / down | J | F | J&F first / second / remain "
-              "| Δ video-cluster CI | Δ vs same-cost ref (E10a: E7, E10b: E8, E11a: E3a) [object CI; video CI; up / down] | % frame gọi concept | fps | predict_forward mean / p95 ms | bank added (periodic) | GPU h |")
+              "| Δ video-cluster CI | Δ vs same-cost ref / direct control (E10a: E7, E10b: E8, E11a: E3a, E13a: E6, E12/E14/E13b: E10a) [object CI; video CI; up / down] | % frame gọi concept | fps | predict_forward mean / p95 ms | bank added (periodic) | GPU h |")
     md.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
-    order = ["E0", "E1", "E2", "E3a", "E3b", "E6", "E7", "E7bd", "E8", "E10a", "E10b", "E11a", "E4b40", "E0r",
+    order = ["E0", "E1", "E2", "E3a", "E3b", "E6", "E7", "E7bd", "E8", "E10a", "E10b", "E11a", "E13a", "E12", "E14", "E13b", "E4b40", "E0r",
              "E0@short10", "E4", "E4b", "E0@multiobj", "E2b"]
     desc = {n: d for n, _, d in EXPS}
     desc.update({"E0@short10": "E0 on the 10 shortest", "E0@multiobj": "E0 on the 3 multi-object videos"})
@@ -218,6 +235,15 @@ def main():
         md.append(f"E6 frames added to the bank: {stats['E6']['added']} "
                   f"({stats['E6']['added_periodic']} by the every-10-frames rule); "
                   f"E0r: {stats['E0r']['added'] if 'E0r' in stats else 'n/a'}")
+    bank_runs = [n for n in ("E13a", "E12", "E14", "E13b") if n in per_vid]
+    if bank_runs:
+        worst = sorted(per_vid["E0"], key=per_vid["E0"].get)[:10]
+        objs = [k for k in obj_jf["E0"] if k[0] in worst]
+        md.append("\nBank runs (experiments/bank/): 10 worst E0 videos (object mean J&F): " + ", ".join(
+            f"{n} {np.mean([obj_jf[n][k] for k in objs]):.1f}" for n in ["E0", "E6", "E10a"] + bank_runs))
+        md.append("Median non-call frame time (ms; E0r 76 = GPU not shared): " + ", ".join(
+            f"{n} {stats[n]['nocall_ms']:.0f}" for n in ["E0r", "E6", "E10a"] + bank_runs if n in stats)
+            + ". Bank added (periodic): periodic = every-10-frames rule (E6, E12) or GT frame (E13a, E13b).")
 
     # E5 cost plot
     v0 = list(csv.DictReader(open("experiments/E0/videos.csv")))
@@ -254,7 +280,8 @@ def main():
         fig.tight_layout(rect=(0, 0.04, 1, 1)); fig.savefig(f"{OUT}/cost_vs_accuracy.png", dpi=130)
 
     # incident tables (from analyze_frames.py, msl5 cuts)
-    inc_exps = [n for n in ("E0", "E7", "E8", "E10a", "E10b", "E11a") if os.path.exists(f"experiments/analysis/{n}/incidents.csv")]
+    inc_exps = [n for n in ("E0", "E7", "E8", "E10a", "E10b", "E11a", "E6", "E13a", "E12", "E14", "E13b")
+                if os.path.exists(f"{adir(n)}/incidents.csv")]
     if inc_exps:
         md.append("\n## Incidents (J drop > 0.3 vs mean of previous 5 frames; cuts = msl5; "
                   "'concept' = a concept call for this object within ±2 frames)\n")
@@ -262,7 +289,7 @@ def main():
                   "| no cut, no concept |")
         md.append("|---|---|---|---|---|")
         for n in inc_exps:
-            inc = list(csv.DictReader(open(f"experiments/analysis/{n}/incidents.csv")))
+            inc = list(csv.DictReader(open(f"{adir(n)}/incidents.csv")))
             cells = []
             for ac, tg in (("1", "1"), ("1", "0"), ("0", "1"), ("0", "0")):
                 g = [i for i in inc if i["at_cut"] == ac and i["triggered"] == tg]

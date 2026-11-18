@@ -314,6 +314,7 @@ class SAM2VideoPredictor(_SAM2VideoPredictor):
                     num_obj_ptr_tokens=_language_embd.shape[0],
                 )
                 pix_feat_with_language = pix_feat_with_language.permute(1, 2, 0).view(1, 256, 64, 64)
+                pix_feat_mem = pix_feat
                 pix_feat = (pix_feat_with_language + pix_feat) / 2
 
             # apply SAM-style segmentation head
@@ -331,6 +332,53 @@ class SAM2VideoPredictor(_SAM2VideoPredictor):
                 high_res_features=high_res_features,
                 multimask_output=multimask_output,
             )
+            # experiments (E17, set by propagate_in_video; None = original behaviour)
+            e17 = getattr(self, "_exp_e17", None)
+            if e17 is not None and language_embd is not None:
+                if e17.get("log_norms"):
+                    # per-pixel L2 norm over channels, mean over pixels: a = memory, b = concept, (a+b)/2
+                    _n = lambda x: float(x.float().norm(dim=1).mean())
+                    e17["norms"] = dict(norm_a=_n(pix_feat_mem), norm_b=_n(pix_feat_with_language),
+                                        norm_mix=_n(pix_feat), cos_ab=float(torch.nn.functional.cosine_similarity(
+                                            pix_feat_mem.float(), pix_feat_with_language.float(), dim=1).mean()))
+                    for w in e17.get("sweep_ws") or []:
+                        # E17c: norm of f_w = (1 - w) a + w b
+                        e17["norms"][f"norm_f{round(w * 100):03d}"] = _n(
+                            (1 - w) * pix_feat_mem + w * pix_feat_with_language)
+                if e17.get("lost"):
+                    # decoder on f_w = (1 - w) a + w b (E17a: w = 1, concept branch alone; E17c: --fusion_w);
+                    # keep it if mask not empty, pred IoU and object score pass the thresholds, else keep the
+                    # original (a+b)/2 output. w = 0.5 is the original output (never "kept"). With sweep_ws
+                    # (E17c offline sweep) the decoder runs for every w, nothing is kept.
+                    _stat = lambda s: dict(low_res=s[3], iou=float(s[2].float().max()),
+                                           logit=float(s[6].float().max()), nonempty=bool((s[4] > 0).any()))
+                    w_run, sweep_ws = e17.get("fusion_w", 1.0), e17.get("sweep_ws")
+                    outs = {}
+                    for w in sorted(set(sweep_ws or []) | {w_run}):
+                        if w == 0.5:
+                            s_w, f_w = sam_outputs, pix_feat
+                        else:
+                            f_w = pix_feat_with_language if w == 1.0 else \
+                                (1 - w) * pix_feat_mem + w * pix_feat_with_language
+                            s_w = self._forward_sam_heads(
+                                backbone_features=f_w,
+                                point_inputs=point_inputs,
+                                mask_inputs=mask_inputs,
+                                high_res_features=high_res_features,
+                                multimask_output=multimask_output,
+                            )
+                        st = _stat(s_w)
+                        st["gate"] = st["nonempty"] and st["iou"] >= e17["iou_thresh"] and st["logit"] > e17["logit_thresh"]
+                        outs[w] = (st, s_w, f_w)
+                    con, sam_con, feat_con = outs[w_run]
+                    accept = con["gate"] and w_run != 0.5 and not sweep_ws
+                    e17["out"] = dict(mix=_stat(sam_outputs), con=con, accept=accept)
+                    if sweep_ws:
+                        e17["out"]["sweep"] = {w: outs[w][0] for w in sweep_ws}
+                    if accept and e17.get("commit", "full") != "output":
+                        # E18 --e17_commit output: the kept mask only replaces the scored output (modeling_sec);
+                        # the tracking state (memory, object pointer, scores) stays the mix output
+                        sam_outputs, pix_feat = sam_con, feat_con
         return current_out, sam_outputs, high_res_features, pix_feat
     
     def track_step(

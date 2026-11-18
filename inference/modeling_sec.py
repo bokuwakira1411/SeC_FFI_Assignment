@@ -27,6 +27,7 @@ from transformers.utils import ModelOutput, logging
 from transformers import StoppingCriteriaList, StoppingCriteria
 
 from .configuration_sec import SeCConfig
+from .sam2.utils.misc import fill_holes_in_mask_scores
 from .modeling_intern_vit import InternVisionModel, has_flash_attn
 
 from .sam2_video_predictor import build_sam2_video_predictor, SAM2VideoPredictor
@@ -557,6 +558,35 @@ class SeCModel(PreTrainedModel):
         #   unc_area_drop (r, None = off): mask area of f-1 < (1 - r) * mean of the w frames before it,
         #   unc_empty_n (N, 0 = off): mask empty on frames f-N..f-1,
         #   unc_window (w, default 5), unc_cooldown (C): no uncertainty call if the last concept call is <= C back.
+        #   bank_gt_gap (int, 0 = off; oracle): like bank_extra_gap, but the frame is added with its GT mask
+        #              (gt_mask_fn(frame_idx) -> bool mask or None), skipped if the GT is missing / empty; no
+        #              mask / object-score test.
+        #   bank_diverse_tau (float, None = off): replaces the bank rule. Candidate = tracked frame with mask not
+        #              empty and object score > bank_score_thresh, if HSV trigger or >= bank_diverse_gap (5) frames
+        #              after the last candidate. Descriptor = Hiera feature (current_vision_feats[-1]) averaged
+        #              in the mask, L2-normalised. Added if max cosine to the bank < tau; when the bank holds
+        #              mllm_memory_size frames, the frame (not the start frame) most similar to it is dropped.
+        #   concept_only_lost (bool, E17): "lost" = mask empty or object score logit <= 0 on the last lost_n (2)
+        #              tracked frames (the start frame does not count). On a concept-call frame while lost, the
+        #              decoder also runs on the concept branch alone (token_attn output, no (a+b)/2); that mask is
+        #              kept if not empty, pred IoU >= concept_only_iou (0.78) and object score > concept_only_logit
+        #              (1), and the frame is then added to the MLLM memory (bank_reason added_concept) if not
+        #              added by the bank rule; otherwise the original output is kept. gt_mask_fn (if given) is
+        #              only used for logging J of both masks.
+        #   e17_commit ('full' default = E17a; E18): where a kept concept mask goes. 'pixel': output and pixel
+        #              memory, not added to the MLLM memory directly (the bank rule still applies); 'output': only
+        #              the scored output (yielded mask), the tracking state and bank stay those of the mix output.
+        #   bank_confirm_k (int k, 0 = off; E18b, with e17_commit 'pixel'): a kept concept mask's frame (if not
+        #              added by the bank rule) is added to the MLLM memory only after the next k tracked frames all
+        #              have a mask not empty, pred IoU >= concept_only_iou and object score > concept_only_logit;
+        #              otherwise it is dropped. Logged in column bank_confirm (pend / add / drop:<frame>).
+        #   fusion_w (float, default 1.0; E17c): with concept_only_lost, the decoder runs on
+        #              f_w = (1 - w) a + w b (a = memory, b = concept) instead of b alone; w = 0.5 = original.
+        #   fusion_sweep (list of w, None = off; E17c offline): with concept_only_lost, the decoder runs for every
+        #              w on concept-call frames while lost (columns sw<100 w>_*), the output is never changed.
+        #   lost_call_every (int K, 0 = off; E17b): while lost, also compute the concept when the last concept
+        #              call is >= K frames back (concept_reason 'lost').
+        #   log_feat_norms (bool): log the norms of a, b, (a+b)/2 and cos(a, b) on concept-call frames.
         hsv_thresh = 0.35 if exp_ctx is None else exp_ctx.get("hsv_thresh", 0.35)
         concept_mode = "default" if exp_ctx is None else exp_ctx.get("concept_mode", "default")
         exp_rows = None if exp_ctx is None else exp_ctx.get("rows")
@@ -575,6 +605,22 @@ class SeCModel(PreTrainedModel):
         unc_w = 5 if exp_ctx is None else exp_ctx.get("unc_window", 5)
         unc_C = 0 if exp_ctx is None else exp_ctx.get("unc_cooldown", 0)
         unc_on = trigger_mode != "hsv"
+        bank_gt_gap = 0 if exp_ctx is None else exp_ctx.get("bank_gt_gap", 0)
+        div_tau = None if exp_ctx is None else exp_ctx.get("bank_diverse_tau")
+        div_gap = 5 if exp_ctx is None else exp_ctx.get("bank_diverse_gap", 5)
+        e17_on = False if exp_ctx is None else exp_ctx.get("concept_only_lost", False)
+        lost_n = 2 if exp_ctx is None else exp_ctx.get("lost_n", 2)
+        lost_every = 0 if exp_ctx is None else exp_ctx.get("lost_call_every", 0)
+        log_norms = False if exp_ctx is None else exp_ctx.get("log_feat_norms", False)
+        _lost_hist = []  # per tracked frame: mask empty or object score logit <= 0 (only filled when e17_on)
+        # read by the grounding encoder's _track_step (None = original behaviour)
+        self.grounding_encoder._exp_e17 = None if not (e17_on or log_norms) else dict(
+            iou_thresh=exp_ctx.get("concept_only_iou", 0.78), logit_thresh=exp_ctx.get("concept_only_logit", 1.0),
+            log_norms=log_norms, fusion_w=exp_ctx.get("fusion_w", 1.0), sweep_ws=exp_ctx.get("fusion_sweep"),
+            commit=exp_ctx.get("e17_commit", "full"))
+        e17_commit = "full" if exp_ctx is None else exp_ctx.get("e17_commit", "full")
+        confirm_k = 0 if exp_ctx is None else exp_ctx.get("bank_confirm_k", 0)
+        _pending = []  # bank_confirm_k: [frame, mask, frames left to confirm]
         _unc_logit, _unc_area = [], []  # per processed frame (incl. cond frame), only filled when unc_on
         if not self.init_prediction_config:
             assert tokenizer
@@ -621,6 +667,12 @@ class SeCModel(PreTrainedModel):
         mllm_memory = [(start_frame_idx, Image.open(video_paths[start_frame_idx]).convert('RGB'), init_mask)]
         for k, k_mask in ([] if exp_ctx is None else exp_ctx.get("oracle_keyframes") or []):
             mllm_memory.append((k, Image.open(video_paths[k]).convert('RGB'), k_mask))
+        if div_tau is not None:
+            # bank_diverse_tau: one descriptor per mllm_memory entry; the bank is kept at <= mllm_memory_size
+            assert len(mllm_memory) == 1, "bank_diverse_tau does not support oracle_keyframes"
+            _vf = self.grounding_encoder._get_image_feature(inference_state, start_frame_idx, batch_size)[2][-1]
+            _div_desc = [mask_pooled_descriptor(_vf, init_mask)]
+            _div_last_cand = start_frame_idx
         # experiments: frames used by the SAM 2 pixel memory (filled by _prepare_memory_conditioned_features)
         self.grounding_encoder._exp_mem_frames = [] if exp_rows is not None else None
 
@@ -704,6 +756,9 @@ class SeCModel(PreTrainedModel):
                         flags, _reason = [True], "burst"
                 elif sparse_every > 0 and frame_idx - _last_call >= sparse_every and flags != [True]:
                     flags, _reason = [True], "sparse"
+                _lost = e17_on and len(_lost_hist) >= lost_n and all(_lost_hist[-lost_n:])
+                if _lost and lost_every > 0 and flags != [True] and frame_idx - _last_call >= lost_every:
+                    flags, _reason = [True], "lost"
                 if flags == [True]:
                     _last_call = frame_idx
                 if len(mllm_memory) > mllm_memory_size:
@@ -744,6 +799,11 @@ class SeCModel(PreTrainedModel):
                                 ctx_frames=" ".join(str(f) for f, _, _ in _mllm_memory))
 
 
+                _e17 = self.grounding_encoder._exp_e17
+                if _e17 is not None:
+                    _e17["lost"] = _lost
+                    _e17.pop("out", None)
+                    _e17.pop("norms", None)
                 current_out, pred_masks = self.grounding_encoder._run_single_frame_inference(
                     **inference_params, language_embd=language_embd
                 )
@@ -774,10 +834,101 @@ class SeCModel(PreTrainedModel):
             # was computed is added if its mask is not empty and its object score > 1.
             _mem_appended = 0
             _bank_reason = ""
+            _div_maxcos = ""
+            _e17_row = {}
+            _out_masks = video_res_masks  # yielded (scored) masks; differs only with e17_commit 'output'
+            if e17_on and _tracked:
+                _e17_row["e17_lost"] = int(_lost)
+                _e17_out = self.grounding_encoder._exp_e17.get("out")
+                if _e17_out is not None:
+                    torch.cuda.synchronize()
+                    _t_e17 = time.perf_counter()
+                    _vm = {}
+                    # E17c sweep: one entry per w, columns sw<100 w>_* (sw050 = mix)
+                    _ent = {"mix": _e17_out["mix"], "con": _e17_out["con"],
+                            **{f"sw{round(_w * 100):03d}": _st for _w, _st in _e17_out.get("sweep", {}).items()}}
+                    for _k, _st in _ent.items():
+                        _lr = _st["low_res"]
+                        if self.grounding_encoder.fill_hole_area > 0:
+                            _lr = fill_holes_in_mask_scores(_lr, self.grounding_encoder.fill_hole_area)
+                        _vm[_k] = self.grounding_encoder._get_orig_video_res_output(inference_state, _lr)[1][0, 0] > 0.0
+                        _e17_row.update({f"{_k}_iou": round(_st["iou"], 5),
+                                         f"{_k}_logit": round(_st["logit"], 5),
+                                         f"{_k}_px": int(_vm[_k].sum())})
+                        if _k.startswith("sw"):
+                            _e17_row[f"{_k}_gate"] = int(_st["gate"])
+                    _e17_row["e17_accept"] = int(_e17_out["accept"])
+                    if _e17_out["accept"] and e17_commit == "output":
+                        # same path as the tracked output: fill holes on the low-res logits, resize to video res
+                        _lr = _e17_out["con"]["low_res"]
+                        if self.grounding_encoder.fill_hole_area > 0:
+                            _lr = fill_holes_in_mask_scores(_lr, self.grounding_encoder.fill_hole_area)
+                        _out_masks = self.grounding_encoder._get_orig_video_res_output(
+                            inference_state, _lr.to('cpu', non_blocking=True))[1]
+                    if exp_ctx.get("gt_mask_fn") is not None:
+                        _gt = exp_ctx["gt_mask_fn"](frame_idx)
+                        if _gt is not None:
+                            _g = torch.from_numpy(np.asarray(_gt)).to(_vm["mix"].device).reshape(_vm["mix"].shape)
+                            _e17_row["gt_empty"] = int(not _g.any())
+                            for _k in _vm:
+                                _u = (_g | _vm[_k]).sum()
+                                _e17_row[f"J_{_k}"] = round(1.0 if _u == 0 else float((_g & _vm[_k]).sum() / _u), 5)
+                    if _vm["con"].any():
+                        # cosine of the concept mask's descriptor to the bank frames given to the MLLM on this
+                        # frame (descriptor as bank_diverse_tau)
+                        _d = mask_pooled_descriptor(self.grounding_encoder._get_image_feature(
+                            inference_state, frame_idx, batch_size)[2][-1], _vm["con"])
+                        _cos = [float(_d @ mask_pooled_descriptor(self.grounding_encoder._get_image_feature(
+                            inference_state, _bf, batch_size)[2][-1], np.asarray(_bm).squeeze()))
+                                for _bf, _, _bm in _mllm_memory]
+                        _e17_row["con_maxcos"] = round(max(_cos), 5)
+                    torch.cuda.synchronize()
+                    # logging only (J, descriptors): subtract from frame_ms for timing
+                    _e17_row["e17_log_ms"] = round((time.perf_counter() - _t_e17) * 1000, 2)
+            if _tracked and self.grounding_encoder._exp_e17 is not None and \
+                    self.grounding_encoder._exp_e17.get("norms") is not None:
+                _e17_row.update({k: round(v, 5) for k, v in self.grounding_encoder._exp_e17["norms"].items()})
+            if e17_on and _tracked:
+                _lost_hist.append(bool((video_res_masks[0] > 0.0).sum() == 0
+                                       or current_out["object_score_logits"].item() <= 0))
             _bank_candidate = _hsv_trig if bank_rule == "hsv" else _update_flag
             _periodic = (not _bank_candidate and _tracked and bank_gap > 0
                          and frame_idx - mllm_memory[-1][0] >= bank_gap)
-            if _bank_candidate or _periodic:
+            _gt_periodic = (not _bank_candidate and _tracked and bank_gt_gap > 0
+                            and frame_idx - mllm_memory[-1][0] >= bank_gt_gap)
+            if div_tau is not None:
+                _cur_mask = video_res_masks[0] > 0.0
+                if (_tracked and _cur_mask.sum() > 0
+                        and current_out["object_score_logits"].item() > bank_score_thresh
+                        and (_hsv_trig or frame_idx - _div_last_cand >= div_gap)):
+                    _div_last_cand = frame_idx
+                    _vf = self.grounding_encoder._get_image_feature(inference_state, frame_idx, batch_size)[2][-1]
+                    _d = mask_pooled_descriptor(_vf, _cur_mask)
+                    _cos = [float(_d @ e) for e in _div_desc]
+                    _div_maxcos = round(max(_cos), 5)
+                    if max(_cos) >= div_tau:
+                        _bank_reason = "div_redundant"
+                    else:
+                        _bank_reason = "added_div"
+                        if len(mllm_memory) >= mllm_memory_size:
+                            _drop = 1 + int(np.argmax(_cos[1:]))
+                            del mllm_memory[_drop], _div_desc[_drop]
+                            _bank_reason = "added_div_replace"
+                        mllm_memory.append((
+                            frame_idx, Image.open(video_paths[frame_idx]).convert('RGB'),
+                            _cur_mask.cpu().numpy()
+                        ))
+                        _div_desc.append(_d)
+                        _mem_appended = 1
+            elif _gt_periodic:
+                _gt = exp_ctx["gt_mask_fn"](frame_idx)
+                if _gt is None or not _gt.any():
+                    _bank_reason = "gt_empty"
+                else:
+                    mllm_memory.append((frame_idx, Image.open(video_paths[frame_idx]).convert('RGB'), _gt[None]))
+                    _mem_appended = 1
+                    _bank_reason = "added_gt"
+            if div_tau is None and (_bank_candidate or _periodic):
                 if (video_res_masks[0] > 0.0).sum() == 0:
                     _bank_reason = "empty_mask" if _bank_candidate else ""
                 elif current_out["object_score_logits"].item() <= bank_score_thresh:
@@ -792,6 +943,35 @@ class SeCModel(PreTrainedModel):
                     ))
                     _mem_appended = 1
                     _bank_reason = "added" if _bank_candidate else "added_periodic"
+            if _e17_row.get("e17_accept") and e17_commit == "full" and not _mem_appended and \
+                    not any(f == frame_idx for f, _, _ in mllm_memory):
+                # E17: a frame whose concept-only mask was kept goes into the MLLM memory directly
+                mllm_memory.append((
+                    frame_idx, Image.open(video_paths[frame_idx]).convert('RGB'),
+                    (video_res_masks[0] > 0.0).cpu().numpy()
+                ))
+                _mem_appended = 1
+                _bank_reason = "added_concept"
+            if confirm_k and _tracked:
+                _confirm_log = []
+                _ok = bool((video_res_masks[0] > 0.0).sum() > 0) \
+                    and float(current_out["ious"].float().max()) >= self.grounding_encoder._exp_e17["iou_thresh"] \
+                    and current_out["object_score_logits"].item() > self.grounding_encoder._exp_e17["logit_thresh"]
+                for _p in list(_pending):
+                    _p[2] -= 1
+                    if not _ok:
+                        _pending.remove(_p)
+                        _confirm_log.append(f"drop:{_p[0]}")
+                    elif _p[2] == 0:
+                        _pending.remove(_p)
+                        if not any(f == _p[0] for f, _, _ in mllm_memory):
+                            mllm_memory.append((_p[0], Image.open(video_paths[_p[0]]).convert('RGB'), _p[1]))
+                            _confirm_log.append(f"add:{_p[0]}")
+                if _e17_row.get("e17_accept") and not _mem_appended and \
+                        not any(f == frame_idx for f, _, _ in mllm_memory):
+                    _pending.append([frame_idx, (video_res_masks[0] > 0.0).cpu().numpy(), confirm_k])
+                    _confirm_log.append(f"pend:{frame_idx}")
+                _e17_row["bank_confirm"] = " ".join(_confirm_log)
             if exp_rows is not None:
                 torch.cuda.synchronize()
                 ious = current_out.get("ious")
@@ -800,16 +980,19 @@ class SeCModel(PreTrainedModel):
                     hsv_trigger=int(_hsv_trig),
                     mem_appended=_mem_appended,
                     bank_reason=_bank_reason,
-                    mask_px=int((video_res_masks[0] > 0.0).sum()),
+                    div_maxcos=_div_maxcos,
+                    mask_px=int((_out_masks[0] > 0.0).sum()),
                     pred_iou=round(float(ious.float().max()), 5) if ious is not None else "",
                     object_score_logit=round(float(obj_score.float().max()), 5) if obj_score is not None else "",
                     frame_ms=round((time.perf_counter() - _t_frame) * 1000, 2),
                     bank_frames=" ".join(str(f) for f, _, _ in mllm_memory),
                     sam_mem_frames=" ".join(str(f) for f in self.grounding_encoder._exp_mem_frames),
+                    **_e17_row,
                 )
                 exp_rows.append(_row)
-            yield frame_idx, obj_ids, video_res_masks
+            yield frame_idx, obj_ids, _out_masks
         self.grounding_encoder._exp_mem_frames = None
+        self.grounding_encoder._exp_e17 = None
 
     def predict_forward(
         self,
@@ -889,6 +1072,19 @@ def label_img_with_mask(img, mask):
         cv2.drawContours(frame, [contour], -1, (0, 255, 0), 2)
     frame = Image.fromarray(frame) 
     return frame
+
+def mask_pooled_descriptor(vision_feat, mask):
+    """Bank descriptor (bank_diverse_tau): SAM 2 Hiera feature of a frame (current_vision_feats[-1],
+    [HW, B, C], B = 1) averaged inside the mask (bool, any resolution, area-resized to the feature grid),
+    L2-normalised. Returns a float32 [C] tensor on the feature's device."""
+    hw, _, c = vision_feat.shape
+    side = int(round(hw ** 0.5))
+    m = mask if torch.is_tensor(mask) else torch.from_numpy(np.asarray(mask))
+    m = m.to(vision_feat.device).float().reshape(1, 1, *m.shape[-2:])
+    w = F.interpolate(m, size=(side, side), mode="area").reshape(hw)
+    d = (w @ vision_feat[:, 0, :].float()) / w.sum()
+    return F.normalize(d, dim=0)
+
 
 def is_scene_change_hsv(img1, img2, threshold=0.35):
     return hsv_distance(img1, img2) > threshold
